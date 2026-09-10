@@ -1,6 +1,0 @@
-@GM_HostAddress = http://localhost:5012
-
-GET {{GM_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
