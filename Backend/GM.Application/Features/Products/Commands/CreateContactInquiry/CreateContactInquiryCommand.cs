@@ -6,5 +6,5 @@ public record CreateContactInquiryCommand(
     string Name,
     string Email,
     string Subject,
-    string Message
+    string Message  
 ) : IRequest; 

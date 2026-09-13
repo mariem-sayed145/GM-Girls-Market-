@@ -20,6 +20,9 @@ public static class DependencyInjection
         services.AddScoped<IContactInquiryRepository,
             ContactInquiryRepository>();
 
+        services.AddScoped<IProductRepository,
+            ProductRepository>();
+
         return services;
     }
-} 
+}

@@ -12,6 +12,8 @@ public class GMDbContext : DbContext
 
     public DbSet<ContactInquiry> ContactInquiries => Set<ContactInquiry>();
 
+    public DbSet<Product> Products => Set<Product>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
