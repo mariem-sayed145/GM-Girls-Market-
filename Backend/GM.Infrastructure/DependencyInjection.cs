@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using GM.Application.Abstractions.Services;
 using GM.Infrastructure.Services;
+using GM.Infrastructure.Authentication;
 
 namespace GM.Infrastructure;
 
@@ -35,6 +36,14 @@ public static class DependencyInjection
 
         services.AddScoped<IFileStorageService,
             FileStorageService>();
+
+        services.AddScoped<IPasswordHasher,
+           PasswordHasher>();
+
+        services.AddScoped<IUserRepository,
+          UserRepository>();
+
+        services.AddScoped<IJwtService, JwtService>();
 
         return services;
     }
