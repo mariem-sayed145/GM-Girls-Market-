@@ -18,7 +18,7 @@ public class ContactInquiryRepository : IContactInquiryRepository
         CancellationToken cancellationToken = default)
     {
         await _context.ContactInquiries.AddAsync(
-            inquiry,
+            inquiry, 
             cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);

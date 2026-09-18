@@ -1,4 +1,5 @@
 using GM.Application.Abstractions.Persistence;
+using GM.Application.Abstractions.Services;
 using GM.Domain.Entities;
 using MediatR;
 
@@ -8,23 +9,31 @@ public class CreateProductCommandHandler
     : IRequestHandler<CreateProductCommand, int>
 {
     private readonly IProductRepository _repository;
+    private readonly IFileStorageService _fileStorageService;
 
     public CreateProductCommandHandler(
-        IProductRepository repository)
+        IProductRepository repository,
+        IFileStorageService fileStorageService)
     {
         _repository = repository;
+        _fileStorageService = fileStorageService;
     }
 
     public async Task<int> Handle(
         CreateProductCommand request,
         CancellationToken cancellationToken)
     {
+        var imageUrl = await _fileStorageService.SaveAsync(
+            request.ImageStream,
+            request.ImageFileName,
+            cancellationToken);
+
         var product = new Product(
             request.Name,
             request.Description,
             request.Price,
             request.Category,
-            request.ImageUrl);
+            imageUrl);
 
         await _repository.AddAsync(
             product,
@@ -33,3 +42,4 @@ public class CreateProductCommandHandler
         return product.Id;
     }
 }
+

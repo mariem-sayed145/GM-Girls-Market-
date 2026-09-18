@@ -8,5 +8,6 @@ public record UpdateProductCommand(
     string Description,
     decimal Price,
     string Category,
-    string ImageUrl
+    Stream? ImageStream,
+    string? ImageFileName
 ) : IRequest;

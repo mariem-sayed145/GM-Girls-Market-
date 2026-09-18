@@ -25,8 +25,8 @@ public class CreateProductCommandValidator
             .NotEmpty()
             .WithMessage("Product category is required.");
 
-        RuleFor(x => x.ImageUrl)
+        RuleFor(x => x.ImageFileName)
             .NotEmpty()
-            .WithMessage("Product image URL is required.");
+            .WithMessage("Product image is required.");
     }
 }

@@ -28,6 +28,8 @@ public class DeleteProductCommandHandler
                 $"Product with ID '{request.Id}' was not found.");
         }
 
-        _repository.Delete(product);
+        await _repository.DeleteAsync(
+            product,
+            cancellationToken);
     }
 }

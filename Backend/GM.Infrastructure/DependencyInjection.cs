@@ -4,6 +4,8 @@ using GM.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using GM.Application.Abstractions.Services;
+using GM.Infrastructure.Services;
 
 namespace GM.Infrastructure;
 
@@ -22,6 +24,17 @@ public static class DependencyInjection
 
         services.AddScoped<IProductRepository,
             ProductRepository>();
+
+        services.AddScoped<IFileStorageService, FileStorageService>();
+
+        services.AddScoped<IContactInquiryRepository,
+        ContactInquiryRepository>();
+
+        services.AddScoped<IProductRepository,
+            ProductRepository>();
+
+        services.AddScoped<IFileStorageService,
+            FileStorageService>();
 
         return services;
     }

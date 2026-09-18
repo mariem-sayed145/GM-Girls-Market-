@@ -1,3 +1,4 @@
+using GM.API.Models.Products;
 using GM.Application.Features.Products.Commands.CreateProduct;
 using GM.Application.Features.Products.Commands.DeleteProduct;
 using GM.Application.Features.Products.Commands.UpdateProduct;
@@ -20,10 +21,27 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create(
-        CreateProductCommand command,
+        [FromForm] CreateProductRequest request,
         CancellationToken cancellationToken)
     {
+        if (request.Image is null || request.Image.Length == 0)
+        {
+            return BadRequest("Product image is required.");
+        }
+
+        await using var imageStream =
+            request.Image.OpenReadStream();
+
+        var command = new CreateProductCommand(
+            request.Name,
+            request.Description,
+            request.Price,
+            request.Category,
+            imageStream,
+            request.Image.FileName);
+
         var id = await _mediator.Send(
             command,
             cancellationToken);
@@ -63,16 +81,23 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> Update(
         int id,
-        UpdateProductCommand command,
+        [FromForm] UpdateProductRequest request,
         CancellationToken cancellationToken)
     {
-        if (id != command.Id)
-        {
-            return BadRequest(
-                "Route ID does not match product ID.");
-        }
+        await using var imageStream =
+            request.Image?.OpenReadStream();
+
+        var command = new UpdateProductCommand(
+            id,
+            request.Name,
+            request.Description,
+            request.Price,
+            request.Category,
+            imageStream,
+            request.Image?.FileName);
 
         await _mediator.Send(
             command,
