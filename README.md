@@ -1,12 +1,14 @@
-﻿# Girls Market (GM)
+# Girls Market (GM)
 
-**Girls Market** is a full-stack web application that connects customers with talented women offering fashion, accessories, bags, gifts, and handmade products.
+**Girls Market** is a full-stack marketplace web application that connects customers with talented women offering fashion, accessories, bags, gifts, and handmade products.
 
-The project was developed as part of the **VOLTIX Internship Task** and focuses on building a real frontend-to-backend flow using a clean and maintainable backend architecture.
+The project was developed as part of the **VOLTIX Internship Task** and focuses on building a real frontend-to-backend flow using a clean, maintainable, and scalable backend architecture.
 
 ---
 
 ## Features
+
+### Customer Experience
 
 * Modern responsive landing page
 * Product showcase
@@ -14,30 +16,66 @@ The project was developed as part of the **VOLTIX Internship Task** and focuses 
 * Seller call-to-action section
 * Contact & Inquiry form
 * Frontend connected to a real Backend API
+
+### Product Management
+
+* Product listing
+* Get product by ID
+* Create products
+* Update products
+* Delete products
+* Product categories
+* Product image upload
+* Product images stored on the backend
+* Protected product management endpoints
+
+### Authentication & Authorization
+
+* User registration
+* User login
+* Secure password hashing
+* JWT-based authentication
+* Protected API endpoints
+* Protected frontend routes
+* Current authenticated user endpoint
+* Logout functionality
+* Authentication token handling on frontend
+
+### Backend
+
 * Server-side validation
-* Invalid form submissions return proper error responses
+* Invalid requests return proper error responses
 * Valid inquiries are stored in SQL Server
-* Clean Architecture backend
+* Products are stored in SQL Server
+* Users are stored in SQL Server
+* Clean Architecture
 * MediatR request/handler pattern
 * FluentValidation
 * Entity Framework Core
+* Repository Pattern
+* Dependency Injection
 * Global exception handling
 * Swagger API documentation
-* CORS configuration for frontend-backend communication
+* CORS configuration
+* JWT authentication
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-### Frontend
+## Frontend
 
 * React
 * Vite
 * JavaScript
 * HTML
 * CSS
+* React Router
+* Fetch API
+* FormData
+* Local Storage for authentication state
 
-### Backend
+## Backend
 
 * .NET 10
 * ASP.NET Core Web API
@@ -45,12 +83,16 @@ The project was developed as part of the **VOLTIX Internship Task** and focuses 
 * MediatR
 * FluentValidation
 * Entity Framework Core
+* JWT Authentication
+* Repository Pattern
+* Dependency Injection
 
-### Database
+## Database
 
 * SQL Server
+* Entity Framework Core Migrations
 
-### Development Tools
+## Development Tools
 
 * Visual Studio / VS Code
 * Swagger
@@ -68,11 +110,28 @@ GM (Girls Market)
 │   └── gm-client
 │       ├── public
 │       ├── src
+│       │   ├── api
+│       │   │   ├── authApi.js
+│       │   │   └── productApi.js
+│       │   │
 │       │   ├── assets
+│       │   │
+│       │   ├── components
+│       │   │   └── ProtectedRoute.jsx
+│       │   │
+│       │   ├── pages
+│       │   │   ├── Home.jsx
+│       │   │   ├── Login.jsx
+│       │   │   ├── Register.jsx
+│       │   │   ├── AdminProducts.jsx
+│       │   │   ├── AddProduct.jsx
+│       │   │   └── EditProduct.jsx
+│       │   │
 │       │   ├── App.jsx
 │       │   ├── App.css
 │       │   ├── index.css
 │       │   └── main.jsx
+│       │
 │       ├── package.json
 │       └── vite.config.js
 │
@@ -80,6 +139,10 @@ GM (Girls Market)
     ├── GM.API
     │   ├── Controllers
     │   ├── Middleware
+    │   ├── Models
+    │   ├── wwwroot
+    │   │   └── images
+    │   │       └── products
     │   └── Program.cs
     │
     ├── GM.Application
@@ -93,10 +156,12 @@ GM (Girls Market)
     │   └── Entities
     │
     └── GM.Infrastructure
+        ├── Authentication
         ├── Persistence
         │   ├── Context
         │   ├── Configurations
         │   └── Repositories
+        ├── Services
         └── DependencyInjection.cs
 ```
 
@@ -104,7 +169,7 @@ GM (Girls Market)
 
 # Backend Architecture
 
-The backend follows **Clean Architecture**, separating business logic, application logic, infrastructure, and API concerns.
+The backend follows **Clean Architecture**, separating business logic, application logic, infrastructure concerns, and API responsibilities.
 
 ```text
                  GM.API
@@ -123,10 +188,12 @@ The backend follows **Clean Architecture**, separating business logic, applicati
 
 Contains the core business entities and domain logic.
 
-Example:
+Current entities include:
 
 ```text
 ContactInquiry
+Product
+User
 ```
 
 ### GM.Application
@@ -136,7 +203,9 @@ Contains application use cases and business workflows.
 It includes:
 
 * MediatR Commands
+* MediatR Queries
 * Command Handlers
+* Query Handlers
 * FluentValidation
 * Application abstractions
 * Validation Pipeline Behavior
@@ -149,6 +218,9 @@ Handles external concerns such as:
 * SQL Server
 * Database configuration
 * Repository implementations
+* Password hashing
+* JWT token generation
+* File storage
 * Dependency Injection
 
 ### GM.API
@@ -157,17 +229,20 @@ Provides the HTTP API and handles:
 
 * Controllers
 * HTTP requests/responses
+* Authentication
+* Authorization
 * Middleware
 * CORS
 * Swagger
+* Static file serving
 
 ---
 
 # Contact & Inquiry System
 
-The main backend feature implemented in this task is the **Contact & Inquiry System**.
+Visitors can submit inquiries through the Contact form.
 
-Visitors can submit:
+The form accepts:
 
 * Name
 * Email
@@ -212,403 +287,94 @@ SQL Server
 
 ---
 
-# Validation
+# Product Management
 
-The backend validates the submitted data before storing it.
+The application includes a complete product management flow.
 
-### Name
-
-The name cannot be empty.
-
-### Email
-
-The email:
-
-* Cannot be empty
-* Must have a valid email format
-
-### Subject
-
-The subject cannot be empty.
-
-### Message
-
-The message cannot be empty.
-
-If validation fails, the API returns:
+## Product Operations
 
 ```text
-400 Bad Request
+GET    /api/Products
+GET    /api/Products/{id}
+POST   /api/Products
+PUT    /api/Products/{id}
+DELETE /api/Products/{id}
 ```
 
-with a response containing the validation errors.
+Product information includes:
 
-Example:
+* Name
+* Description
+* Price
+* Category
+* Image URL
+* Creation date
+* Update date
 
-```json
-{
-  "message": "Validation failed.",
-  "errors": {
-    "Email": [
-      "Please enter a valid email address."
-    ],
-    "Name": [
-      "Name is required."
-    ]
-  }
-}
-```
+Product management endpoints are protected using JWT authentication.
 
 ---
 
-# API Endpoint
+# Product Image Upload
 
-## Create Contact Inquiry
+Products support image uploads using `multipart/form-data`.
+
+The backend:
+
+1. Receives the uploaded image.
+2. Validates the request.
+3. Generates a unique file name.
+4. Stores the image under:
+
+```text
+GM.API/wwwroot/images/products
+```
+
+5. Saves the image URL with the product.
+
+The frontend uses `FormData` when creating or updating products.
+
+---
+
+# Authentication & Authorization
+
+The application uses **JWT Bearer Authentication**.
+
+## Registration
+
+Users can create an account using:
 
 ```http
-POST /api/Contact
+POST /api/Auth/register
 ```
 
-### Request Body
+### Request
 
 ```json
 {
-  "name": "Mariam",
+  "fullName": "Mariam Sayed",
   "email": "mariam@example.com",
-  "subject": "Product Inquiry",
-  "message": "I would like to know more about your products."
+  "password": "password123"
 }
 ```
 
-### Successful Response
+The password is never stored as plain text.
 
-```text
-200 OK
+It is hashed using ASP.NET Core's password hashing functionality before being stored in SQL Server.
+
+---
+
+## Login
+
+Users can log in using:
+
+```http
+POST /api/Auth/login
 ```
+
+### Request
 
 ```json
 {
-  "message": "Your inquiry has been submitted successfully."
-}
+  "email": "mariam@example.com",
 ```
-
----
-
-# Database
-
-The project uses **SQL Server** with **Entity Framework Core**.
-
-Database:
-
-```text
-GMDb
-```
-
-Main table:
-
-```text
-ContactInquiries
-```
-
-The table stores:
-
-| Column    | Description               |
-| --------- | ------------------------- |
-| Id        | Unique inquiry identifier |
-| Name      | Visitor name              |
-| Email     | Visitor email             |
-| Subject   | Inquiry subject           |
-| Message   | Inquiry message           |
-| CreatedAt | Creation timestamp        |
-| UpdatedAt | Last update timestamp     |
-
----
-
-# How to Run the Project
-
-## Prerequisites
-
-Make sure you have the following installed:
-
-* [.NET SDK](https://dotnet.microsoft.com/download)
-* [Node.js](https://nodejs.org/)
-* SQL Server
-* Git
-
----
-
-## 1. Clone the Repository
-
-```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
-```
-
-Then enter the project directory:
-
-```powershell
-cd "GM (Girls Market)"
-```
-
----
-
-# 2. Configure SQL Server
-
-The backend uses the following connection string:
-
-```json
-"DefaultConnection": "Server=localhost;Database=GMDb;Trusted_Connection=True;TrustServerCertificate=True;"
-```
-
-This is located in:
-
-```text
-Backend/GM.API/appsettings.json
-```
-
-Make sure SQL Server is running on your machine.
-
-If your SQL Server instance uses a different server name, update the connection string accordingly.
-
----
-
-# 3. Run the Backend
-
-Open a terminal inside the project root and run:
-
-```powershell
-cd Backend
-```
-
-Restore the .NET dependencies:
-
-```powershell
-dotnet restore
-```
-
-If you don't have the Entity Framework CLI installed:
-
-```powershell
-dotnet tool install --global dotnet-ef
-```
-
-Apply the database migrations:
-
-```powershell
-dotnet ef database update --project GM.Infrastructure --startup-project GM.API
-```
-
-Run the API:
-
-```powershell
-dotnet run --project GM.API
-```
-
-The API should run on:
-
-```text
-http://localhost:5262
-```
-
-Swagger:
-
-```text
-http://localhost:5262/swagger
-```
-
----
-
-# 4. Run the Frontend
-
-Open a **new terminal** while keeping the backend running.
-
-From the project root:
-
-```powershell
-cd "frontend\gm-client"
-```
-
-Install the frontend dependencies:
-
-```powershell
-npm install
-```
-
-Run the React application:
-
-```powershell
-npm run dev
-```
-
-The frontend should run on:
-
-```text
-http://localhost:5173
-```
-
-Open the URL in your browser.
-
----
-
-# 5. Test the Contact Form
-
-Make sure both applications are running:
-
-```text
-Frontend
-http://localhost:5173
-
-Backend
-http://localhost:5262
-```
-
-Go to the Contact section and submit the form.
-
-The frontend sends the data to:
-
-```text
-POST http://localhost:5262/api/Contact
-```
-
-The backend validates the request and stores valid inquiries in SQL Server.
-
-You can verify the stored data in:
-
-```text
-GMDb → ContactInquiries
-```
-
----
-
-# Error Handling
-
-The API includes global exception handling middleware.
-
-Validation errors are converted into a clear HTTP response instead of returning an unhandled server error.
-
-For example:
-
-```text
-Invalid Request
-      ↓
-FluentValidation
-      ↓
-ValidationException
-      ↓
-Global Exception Middleware
-      ↓
-400 Bad Request
-      ↓
-Frontend displays error feedback
-```
-
----
-
-# Frontend & Backend Communication
-
-CORS is configured to allow the React development server to communicate with the API.
-
-Allowed frontend origin:
-
-```text
-http://localhost:5173
-```
-
-The frontend uses the browser `fetch` API to send contact form data to the backend.
-
----
-
-# Testing the API with Swagger
-
-After starting the backend, open:
-
-```text
-http://localhost:5262/swagger
-```
-
-Find:
-
-```text
-POST /api/Contact
-```
-
-Click **Try it out** and send a request such as:
-
-```json
-{
-  "name": "Test User",
-  "email": "test@example.com",
-  "subject": "Test Inquiry",
-  "message": "This is a test message."
-}
-```
-
-A successful request should return:
-
-```text
-200 OK
-```
-
-You can then check SQL Server to confirm that the inquiry was stored.
-
----
-
-# Git Workflow
-
-The project is version controlled using Git.
-
-Example:
-
-```powershell
-git status
-git add .
-git commit -m "Implement contact inquiry system"
-git push
-```
-
----
-
-# Future Improvements
-
-Possible future features include:
-
-* User authentication
-* Seller accounts
-* Product management
-* Shopping cart
-* Orders
-* Payment integration
-* Seller dashboard
-* Admin dashboard
-* Email notifications
-* Image upload
-* Product search and filtering
-* Product reviews
-* Advanced logging
-* Automated tests
-
----
-
-# Author
-
-**Mariam Sayed Ramadan**
-
-Software Engineering | Backend & Full Stack Development | AI
-
----
-
-## Project Goal
-
-The goal of Girls Market is to build a scalable marketplace platform while applying real-world software engineering practices such as:
-
-* Clean Architecture
-* Separation of Concerns
-* SOLID principles
-* RESTful APIs
-* Validation
-* Database design
-* Repository Pattern
-* CQRS/MediatR
-* Dependency Injection
-* Global Exception Handling
-* Frontend-Backend Integration
-
