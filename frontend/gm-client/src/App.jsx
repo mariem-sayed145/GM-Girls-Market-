@@ -4,46 +4,58 @@ import Home from './pages/Home'
 import AdminProducts from './pages/AdminProducts'
 import AddProduct from './pages/AddProduct'
 import EditProduct from './pages/EditProduct'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
-
     return (
         <BrowserRouter>
-
             <Routes>
-
-                {/* Main Website */}
                 <Route
                     path="/"
                     element={<Home />}
                 />
 
+                <Route
+                    path="/login"
+                    element={<Login />}
+                />
 
-                {/* Admin Products */}
+                <Route
+                    path="/register"
+                    element={<Register />}
+                />
+
                 <Route
                     path="/admin/products"
-                    element={<AdminProducts />}
+                    element={
+                        <ProtectedRoute>
+                            <AdminProducts />
+                        </ProtectedRoute>
+                    }
                 />
 
-
-                {/* Add Product */}
                 <Route
                     path="/admin/products/add"
-                    element={<AddProduct />}
+                    element={
+                        <ProtectedRoute>
+                            <AddProduct />
+                        </ProtectedRoute>
+                    }
                 />
 
-
-                {/* Edit Product */}
                 <Route
                     path="/admin/products/edit/:id"
-                    element={<EditProduct />}
+                    element={
+                        <ProtectedRoute>
+                            <EditProduct />
+                        </ProtectedRoute>
+                    }
                 />
-
             </Routes>
-
         </BrowserRouter>
     )
 }
 
 export default App
-
