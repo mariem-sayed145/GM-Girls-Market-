@@ -14,6 +14,8 @@ public class GMDbContext : DbContext
 
     public DbSet<Product> Products => Set<Product>();
 
+    public DbSet<Service> Services => Set<Service>();
+
     public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
