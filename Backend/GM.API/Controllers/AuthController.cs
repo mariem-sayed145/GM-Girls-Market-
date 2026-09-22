@@ -1,5 +1,7 @@
 using GM.API.Models.Authentication;
 using GM.Application.Features.Authentication.Commands.Login;
+using GM.Application.Features.Authentication.Commands.UpdateProfile;
+using GM.Application.Features.Authentication.Queries.GetCurrentUser;
 using GM.Application.Features.Authentication.Commands.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -56,22 +58,45 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser(
+        CancellationToken cancellationToken)
     {
-        var userId = User.FindFirstValue(
+        var idValue = User.FindFirstValue(
             ClaimTypes.NameIdentifier);
 
-        var fullName = User.FindFirstValue(
-            ClaimTypes.Name);
-
-        var email = User.FindFirstValue(
-            ClaimTypes.Email);
-
-        return Ok(new
+        if (!int.TryParse(idValue, out var userId))
         {
-            id = userId,
-            fullName,
-            email
-        });
+            return Unauthorized();
+        }
+
+        var result = await _mediator.Send(
+            new GetCurrentUserQuery(userId),
+            cancellationToken);
+
+        return Ok(result);
+    }
+
+    [Authorize]
+    [HttpPut("me")]
+    public async Task<IActionResult> UpdateCurrentUser(
+        [FromBody] UpdateProfileRequest request,
+        CancellationToken cancellationToken)
+    {
+        var idValue = User.FindFirstValue(
+            ClaimTypes.NameIdentifier);
+
+        if (!int.TryParse(idValue, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        await _mediator.Send(
+            new UpdateProfileCommand(
+                userId,
+                request.FullName,
+                request.Email),
+            cancellationToken);
+
+        return Ok(new { message = "Profile updated successfully." });
     }
 }

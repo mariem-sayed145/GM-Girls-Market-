@@ -6,6 +6,7 @@ import AddProduct from './pages/AddProduct'
 import EditProduct from './pages/EditProduct'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import CustomerDashboard from './pages/CustomerDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -50,6 +51,15 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <EditProduct />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/customer/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <CustomerDashboard />
                         </ProtectedRoute>
                     }
                 />

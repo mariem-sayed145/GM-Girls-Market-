@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import '../App.css'
 import { getProducts } from '../api/productApi'
 
 function Home() {
+    const navigate = useNavigate()
+
+    const [token, setToken] = useState(
+        () => localStorage.getItem('gm_token')
+    )
 
     const [formData, setFormData] = useState({
         name: '',
@@ -176,6 +182,29 @@ function Home() {
                         Contact
                     </a>
 
+                </div>
+
+                <div className="nav-auth">
+                    {!token ? (
+                        <>
+                            <Link to="/login">Login</Link>
+                            <Link to="/register">Register</Link>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/customer/dashboard">Dashboard</Link>
+                            <button
+                                className="nav-logout"
+                                onClick={() => {
+                                    localStorage.removeItem('gm_token')
+                                    setToken(null)
+                                    navigate('/login')
+                                }}
+                            >
+                                Logout
+                            </button>
+                        </>
+                    )}
                 </div>
 
 

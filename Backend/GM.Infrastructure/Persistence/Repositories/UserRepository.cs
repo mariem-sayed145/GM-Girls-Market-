@@ -35,4 +35,24 @@ public class UserRepository : IUserRepository
                 user => user.Email == email,
                 cancellationToken);
     }
+
+    public async Task<User?> GetByIdAsync(
+    int id,
+    CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(
+                user => user.Id == id,
+                cancellationToken);
+    }
+
+    public async Task UpdateAsync(
+    User user,
+    CancellationToken cancellationToken = default)
+    {
+        _context.Users.Update(user);
+
+        await _context.SaveChangesAsync(
+            cancellationToken);
+    }
 }

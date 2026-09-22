@@ -25,4 +25,13 @@ public class User : BaseEntity
         PasswordHash = passwordHash;
         CreatedAt = DateTime.UtcNow;
     }
+
+    public void UpdateProfile(
+        string fullName,
+        string email)
+    {
+        FullName = fullName.Trim();
+        Email = email.Trim().ToLowerInvariant();
+        UpdatedAt = DateTime.UtcNow;
+    }
 }
