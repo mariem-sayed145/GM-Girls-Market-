@@ -7,6 +7,9 @@ import EditProduct from './pages/EditProduct'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CustomerDashboard from './pages/CustomerDashboard'
+import CustomerRequests from './pages/CustomerRequests'
+import AdminRequests from './pages/AdminRequests'
+import EditRequest from './pages/EditRequest'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -60,6 +63,33 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <CustomerDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/customer/requests"
+                    element={
+                        <ProtectedRoute>
+                            <CustomerRequests />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/requests"
+                    element={
+                        <ProtectedRoute>
+                            <AdminRequests />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/requests/edit/:id"
+                    element={
+                        <ProtectedRoute>
+                            <EditRequest />
                         </ProtectedRoute>
                     }
                 />

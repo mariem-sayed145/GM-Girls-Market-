@@ -18,6 +18,8 @@ public class GMDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<CustomerRequest> CustomerRequests => Set<CustomerRequest>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
