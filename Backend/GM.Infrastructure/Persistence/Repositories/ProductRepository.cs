@@ -43,6 +43,42 @@ public class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Product>> GetFilteredAsync(
+        string? search,
+        string? category,
+        decimal? minPrice,
+        decimal? maxPrice,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Products.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLowerInvariant();
+            query = query.Where(p => p.Name.ToLower().Contains(s) || p.Description.ToLower().Contains(s));
+        }
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            var c = category.Trim().ToLowerInvariant();
+            query = query.Where(p => p.Category.ToLower() == c);
+        }
+
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value);
+        }
+
+        return await query
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task UpdateAsync(
         Product product,
         CancellationToken cancellationToken = default)

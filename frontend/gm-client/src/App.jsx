@@ -10,6 +10,9 @@ import CustomerDashboard from './pages/CustomerDashboard'
 import CustomerRequests from './pages/CustomerRequests'
 import AdminRequests from './pages/AdminRequests'
 import EditRequest from './pages/EditRequest'
+import AdminServices from './pages/AdminServices'
+import AddService from './pages/AddService'
+import EditService from './pages/EditService'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -90,6 +93,33 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <EditRequest />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/services"
+                    element={
+                        <ProtectedRoute>
+                            <AdminServices />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/services/add"
+                    element={
+                        <ProtectedRoute>
+                            <AddService />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/services/edit/:id"
+                    element={
+                        <ProtectedRoute>
+                            <EditService />
                         </ProtectedRoute>
                     }
                 />

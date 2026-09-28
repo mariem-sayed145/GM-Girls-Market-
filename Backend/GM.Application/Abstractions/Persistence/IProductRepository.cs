@@ -15,6 +15,13 @@ public interface IProductRepository
     Task<IReadOnlyList<Product>> GetAllAsync(
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<Product>> GetFilteredAsync(
+        string? search,
+        string? category,
+        decimal? minPrice,
+        decimal? maxPrice,
+        CancellationToken cancellationToken = default);
+
     Task UpdateAsync(
         Product product,
         CancellationToken cancellationToken = default);

@@ -18,7 +18,11 @@ public class GetProductsQueryHandler
         GetProductsQuery request,
         CancellationToken cancellationToken)
     {
-        var products = await _repository.GetAllAsync(
+        var products = await _repository.GetFilteredAsync(
+            request.Search,
+            request.Category,
+            request.MinPrice,
+            request.MaxPrice,
             cancellationToken);
 
         return products

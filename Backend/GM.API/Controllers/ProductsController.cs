@@ -54,10 +54,14 @@ public class ProductsController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] string? category,
+        [FromQuery] decimal? minPrice,
+        [FromQuery] decimal? maxPrice,
         CancellationToken cancellationToken)
     {
         var products = await _mediator.Send(
-            new GetProductsQuery(),
+            new GetProductsQuery(search, category, minPrice, maxPrice),
             cancellationToken);
 
         return Ok(products);

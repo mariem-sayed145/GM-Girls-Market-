@@ -10,8 +10,17 @@ const getAuthHeaders = () => {
         : {}
 }
 
-export const getProducts = async () => {
-    const response = await fetch(API_URL, {
+export const getProducts = async (filters = {}) => {
+    const params = new URLSearchParams()
+
+    if (filters.search) params.append('search', filters.search)
+    if (filters.category) params.append('category', filters.category)
+    if (filters.minPrice !== undefined && filters.minPrice !== null) params.append('minPrice', String(filters.minPrice))
+    if (filters.maxPrice !== undefined && filters.maxPrice !== null) params.append('maxPrice', String(filters.maxPrice))
+
+    const url = params.toString() ? `${API_URL}?${params.toString()}` : API_URL
+
+    const response = await fetch(url, {
         headers: getAuthHeaders(),
     })
 

@@ -28,6 +28,13 @@ function Home() {
     const [isLoadingProducts, setIsLoadingProducts] = useState(true)
     const [productsError, setProductsError] = useState('')
 
+    // Filters
+    const [search, setSearch] = useState('')
+    const [categoryFilter, setCategoryFilter] = useState('')
+    const [minPrice, setMinPrice] = useState('')
+    const [maxPrice, setMaxPrice] = useState('')
+    const [categories, setCategories] = useState([])
+
 
     /* =========================
        LOAD PRODUCTS
@@ -46,6 +53,10 @@ function Home() {
 
                 setProducts(data)
 
+                // derive categories for filter
+                const cats = Array.from(new Set(data.map(p => p.category))).filter(Boolean)
+                setCategories(cats)
+
             } catch (error) {
 
                 setProductsError(
@@ -62,6 +73,39 @@ function Home() {
         loadProducts()
 
     }, [])
+
+    const applyFilters = async () => {
+        try {
+            setIsLoadingProducts(true)
+            setProductsError('')
+
+            const filters = {
+                search: search || undefined,
+                category: categoryFilter || undefined,
+                minPrice: minPrice ? Number(minPrice) : undefined,
+                maxPrice: maxPrice ? Number(maxPrice) : undefined,
+            }
+
+            const data = await getProducts(filters)
+
+            setProducts(data)
+        } catch (error) {
+            setProductsError(
+                error.message || 'Failed to load products.'
+            )
+        } finally {
+            setIsLoadingProducts(false)
+        }
+    }
+
+    const clearFilters = async () => {
+        setSearch('')
+        setCategoryFilter('')
+        setMinPrice('')
+        setMaxPrice('')
+
+        await applyFilters()
+    }
 
 
     /* =========================
@@ -161,6 +205,44 @@ function Home() {
 
                     <span>GM</span>
 
+                </div>
+
+                <div className="product-filters">
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+
+                    <select
+                        value={categoryFilter}
+                        onChange={(e) => setCategoryFilter(e.target.value)}
+                    >
+                        <option value="">All Categories</option>
+                        {categories.map((c) => (
+                            <option key={c} value={c}>
+                                {c}
+                            </option>
+                        ))}
+                    </select>
+
+                    <input
+                        type="number"
+                        placeholder="Min Price"
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(e.target.value)}
+                    />
+
+                    <input
+                        type="number"
+                        placeholder="Max Price"
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(e.target.value)}
+                    />
+
+                    <button onClick={applyFilters} className="primary-btn">Apply</button>
+                    <button onClick={clearFilters} className="secondary-btn">Clear</button>
                 </div>
 
 
