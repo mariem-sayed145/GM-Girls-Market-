@@ -1,4 +1,5 @@
 using GM.Domain.Common;
+using GM.Domain.Enums;
 
 namespace GM.Domain.Entities;
 
@@ -10,19 +11,23 @@ public class User : BaseEntity
 
     public string PasswordHash { get; private set; }
 
+    public UserRole Role { get; private set; }
+
     private User()
     {
-        // Required by EF Core
+        
     }
 
     public User(
         string fullName,
         string email,
-        string passwordHash)
+        string passwordHash,
+        UserRole role = UserRole.Customer)
     {
         FullName = fullName;
         Email = email;
         PasswordHash = passwordHash;
+        Role = role;
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -35,3 +40,4 @@ public class User : BaseEntity
         UpdatedAt = DateTime.UtcNow;
     }
 }
+

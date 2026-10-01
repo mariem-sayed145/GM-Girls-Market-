@@ -1,4 +1,5 @@
 using GM.Domain.Entities;
+using GM.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -28,6 +29,10 @@ public class UserConfiguration
         builder.Property(x => x.PasswordHash)
             .IsRequired()
             .HasMaxLength(500);
+
+        builder.Property(x => x.Role)
+            .IsRequired()
+            .HasConversion<int>();
 
         builder.Property(x => x.CreatedAt)
             .IsRequired();

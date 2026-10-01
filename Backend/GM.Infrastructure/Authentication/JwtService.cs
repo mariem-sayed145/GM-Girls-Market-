@@ -51,7 +51,11 @@ public class JwtService : IJwtService
 
             new Claim(
                 ClaimTypes.NameIdentifier,
-                user.Id.ToString())
+                user.Id.ToString()),
+
+            new Claim(
+                ClaimTypes.Role,
+                user.Role.ToString())
         };
 
         var securityKey = new SymmetricSecurityKey(

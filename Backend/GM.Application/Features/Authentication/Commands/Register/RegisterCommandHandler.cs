@@ -1,6 +1,7 @@
 using GM.Application.Abstractions.Persistence;
 using GM.Application.Abstractions.Services;
 using GM.Domain.Entities;
+using GM.Domain.Enums;
 using MediatR;
 
 namespace GM.Application.Features.Authentication.Commands.Register;
@@ -42,7 +43,8 @@ public class RegisterCommandHandler
         var user = new User(
             request.FullName.Trim(),
             email,
-            passwordHash);
+            passwordHash,
+            UserRole.Customer);
 
         await _userRepository.AddAsync(
             user,
@@ -51,3 +53,4 @@ public class RegisterCommandHandler
         return user.Id;
     }
 }
+

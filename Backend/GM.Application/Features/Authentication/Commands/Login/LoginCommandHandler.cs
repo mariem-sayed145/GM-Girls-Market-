@@ -49,6 +49,7 @@ public class LoginCommandHandler
             user.Id,
             user.FullName,
             user.Email,
+            user.Role,
             token);
     }
 }
