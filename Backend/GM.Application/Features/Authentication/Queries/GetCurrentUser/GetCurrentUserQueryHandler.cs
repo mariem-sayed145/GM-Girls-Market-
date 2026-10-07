@@ -30,6 +30,7 @@ public class GetCurrentUserQueryHandler
         return new GetCurrentUserResult(
             user.Id,
             user.FullName,
-            user.Email);
+            user.Email,
+            user.Role);
     }
 }

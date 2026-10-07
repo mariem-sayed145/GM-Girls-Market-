@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getAllRequests } from '../api/requestApi'
 
 function AdminRequests() {
+    const navigate = useNavigate()
     const [requests, setRequests] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState('')
@@ -11,9 +12,7 @@ function AdminRequests() {
         try {
             setIsLoading(true)
             setError('')
-
             const data = await getAllRequests()
-
             setRequests(data)
         } catch (err) {
             setError(err.message || 'Failed to load requests.')
@@ -26,23 +25,29 @@ function AdminRequests() {
         load()
     }, [])
 
+    const handleLogout = () => {
+        localStorage.removeItem('gm_token')
+        localStorage.removeItem('gm_user')
+        navigate('/login')
+    }
+
     return (
         <div className="admin-page">
-
             <div className="admin-header">
-
                 <div>
                     <span className="admin-label">ADMIN PANEL</span>
-
                     <h1>Customer Requests</h1>
-
-                    <p>Manage customer service requests.</p>
+                    <p>Manage customer service requests and update their progress status.</p>
                 </div>
 
                 <div className="admin-header-actions">
-                    <Link to="/admin/services" className="secondary-btn">Back to Services</Link>
+                    <Link to="/" className="secondary-btn">View Store</Link>
+                    <Link to="/admin/products" className="secondary-btn">Products</Link>
+                    <Link to="/admin/services" className="secondary-btn">Services</Link>
+                    <button type="button" className="secondary-btn" onClick={handleLogout}>
+                        Log Out
+                    </button>
                 </div>
-
             </div>
 
             {isLoading && <div className="admin-message">Loading requests...</div>}
@@ -71,15 +76,19 @@ function AdminRequests() {
                                     <span className="product-category">Service #{r.serviceId}</span>
                                     <h3>Request #{r.id}</h3>
                                     <p>{r.description}</p>
+                                    {r.preferredDate && (
+                                        <small style={{ color: '#888' }}>
+                                            Preferred: {new Date(r.preferredDate).toLocaleDateString()}
+                                        </small>
+                                    )}
                                 </div>
 
-                                <strong>{r.status}</strong>
+                                <strong>Status: {r.status}</strong>
                             </div>
                         </div>
                     ))}
                 </div>
             )}
-
         </div>
     )
 }

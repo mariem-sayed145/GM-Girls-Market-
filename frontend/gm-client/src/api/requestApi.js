@@ -1,14 +1,6 @@
-const API_URL = 'http://localhost:5262/api/CustomerRequests'
+import { API_BASE_URL, getAuthHeaders, parseErrorMessage } from './config'
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('gm_token')
-
-    return token
-        ? {
-            Authorization: `Bearer ${token}`,
-        }
-        : {}
-}
+const API_URL = `${API_BASE_URL}/api/CustomerRequests`
 
 export const createRequest = async (data) => {
     const response = await fetch(API_URL, {
@@ -21,8 +13,8 @@ export const createRequest = async (data) => {
     })
 
     if (!response.ok) {
-        const message = await response.text()
-        throw new Error(message || 'Failed to create request.')
+        const message = await parseErrorMessage(response, 'Failed to create request.')
+        throw new Error(message)
     }
 
     return response.json()
@@ -34,7 +26,8 @@ export const getMyRequests = async () => {
     })
 
     if (!response.ok) {
-        throw new Error('Failed to load requests.')
+        const message = await parseErrorMessage(response, 'Failed to load requests.')
+        throw new Error(message)
     }
 
     return response.json()
@@ -46,7 +39,8 @@ export const getRequestByIdAdmin = async (id) => {
     })
 
     if (!response.ok) {
-        throw new Error('Failed to load request.')
+        const message = await parseErrorMessage(response, 'Failed to load request.')
+        throw new Error(message)
     }
 
     return response.json()
@@ -58,27 +52,25 @@ export const getAllRequests = async () => {
     })
 
     if (!response.ok) {
-        throw new Error('Failed to load requests.')
+        const message = await parseErrorMessage(response, 'Failed to load requests.')
+        throw new Error(message)
     }
 
     return response.json()
 }
 
 export const updateRequestStatus = async (id, status) => {
-    const response = await fetch(
-        `${API_URL}/${id}/status`,
-        {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                ...getAuthHeaders(),
-            },
-            body: JSON.stringify(status),
-        }
-    )
+    const response = await fetch(`${API_URL}/${id}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders(),
+        },
+        body: JSON.stringify(status),
+    })
 
     if (!response.ok) {
-        const message = await response.text()
-        throw new Error(message || 'Failed to update status.')
+        const message = await parseErrorMessage(response, 'Failed to update status.')
+        throw new Error(message)
     }
 }

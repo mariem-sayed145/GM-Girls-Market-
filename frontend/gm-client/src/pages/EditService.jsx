@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getServiceById, updateService, deleteService } from '../api/serviceApi'
+import { getImageUrl } from '../api/config'
 
 function EditService() {
     const { id } = useParams()
@@ -118,7 +119,7 @@ function EditService() {
 
                 <div className="admin-form-row">
                     <div className="form-group">
-                        <label htmlFor="price">Price</label>
+                        <label htmlFor="price">Price (EGP)</label>
                         <input id="price" name="price" type="number" min="0" step="0.01" value={formData.price} onChange={handleChange} required />
                     </div>
 
@@ -130,7 +131,14 @@ function EditService() {
 
                 <div className="form-group">
                     <label>Current Image</label>
-                    {formData.imageUrl && <img src={formData.imageUrl} alt={formData.name} />}
+                    {formData.imageUrl && (
+                        <img
+                            src={getImageUrl(formData.imageUrl)}
+                            alt={formData.name}
+                            className="edit-product-preview"
+                            style={{ maxWidth: '200px', display: 'block', borderRadius: '8px' }}
+                        />
+                    )}
                 </div>
 
                 <div className="form-group">
@@ -141,9 +149,21 @@ function EditService() {
                 {error && <p className="admin-form-error">{error}</p>}
 
                 <div className="admin-form-actions">
-                    <button type="button" className="secondary-btn" onClick={() => navigate('/admin/services')}>Cancel</button>
-                    <button type="submit" className="primary-btn" disabled={isSaving}>{isSaving ? 'Saving...' : 'Save'}</button>
-                    <button type="button" className="secondary-btn" onClick={handleDelete} disabled={isDeleting}>{isDeleting ? 'Deleting...' : 'Delete'}</button>
+                    <button
+                        type="button"
+                        className="delete-btn"
+                        onClick={handleDelete}
+                        disabled={isDeleting || isSaving}
+                    >
+                        {isDeleting ? 'Deleting...' : 'Delete Service'}
+                    </button>
+
+                    <div className="admin-form-right-actions">
+                        <Link to="/admin/services" className="secondary-btn">Cancel</Link>
+                        <button type="submit" className="primary-btn" disabled={isSaving || isDeleting}>
+                            {isSaving ? 'Saving...' : 'Save Changes'}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

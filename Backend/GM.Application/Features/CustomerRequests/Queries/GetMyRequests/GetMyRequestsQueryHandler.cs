@@ -1,4 +1,5 @@
 using GM.Application.Abstractions.Persistence;
+using GM.Application.Features.CustomerRequests.DTOs;
 using MediatR;
 
 namespace GM.Application.Features.CustomerRequests.Queries.GetMyRequests;
@@ -18,6 +19,7 @@ public class GetMyRequestsQueryHandler : IRequestHandler<GetMyRequestsQuery, IRe
 
         return list.Select(r => new CustomerRequestDto(
             r.Id,
+            r.UserId,
             r.ServiceId,
             r.Description,
             r.Status.ToString(),

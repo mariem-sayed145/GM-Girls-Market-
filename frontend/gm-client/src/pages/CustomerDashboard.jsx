@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { getCurrentUser, updateCurrentUser } from '../api/authApi'
 
 function CustomerDashboard() {
+    const navigate = useNavigate()
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -17,7 +19,7 @@ function CustomerDashboard() {
             const data = await getCurrentUser(token)
             setUser(data)
         } catch (err) {
-            setError(err.message || 'Failed to load user.')
+            setError(err.message || 'Failed to load user profile.')
         } finally {
             setLoading(false)
         }
@@ -44,7 +46,6 @@ function CustomerDashboard() {
                 email: user.email,
             })
 
-            // Refresh user from server
             await fetchUser()
             setSuccess('Profile updated successfully.')
         } catch (err) {
@@ -54,43 +55,97 @@ function CustomerDashboard() {
         }
     }
 
-    if (loading) {
-        return <div>Loading profile...</div>
+    const handleLogout = () => {
+        localStorage.removeItem('gm_token')
+        localStorage.removeItem('gm_user')
+        navigate('/login')
     }
 
-    if (error) {
-        return <div style={{ color: 'red' }}>{error}</div>
+    const isStaff =
+        user &&
+        (user.role === 1 ||
+            user.role === 2 ||
+            user.role === 'Employee' ||
+            user.role === 'Admin')
+
+    if (loading) {
+        return (
+            <div className="admin-page">
+                <div className="admin-message">Loading profile...</div>
+            </div>
+        )
     }
 
     return (
-        <div>
-            <h2>Customer Dashboard</h2>
-
-            {success && <div style={{ color: 'green' }}>{success}</div>}
-
-            <form onSubmit={handleSubmit}>
+        <div className="admin-page">
+            <div className="admin-header">
                 <div>
-                    <label>Full Name</label>
-                    <input
-                        name="fullName"
-                        value={user.fullName}
-                        onChange={handleChange}
-                    />
+                    <span className="admin-label">CUSTOMER PORTAL</span>
+                    <h1>Welcome, {user?.fullName || 'Customer'}</h1>
+                    <p>Manage your account settings and service requests.</p>
                 </div>
 
-                <div>
-                    <label>Email</label>
-                    <input
-                        name="email"
-                        value={user.email}
-                        onChange={handleChange}
-                    />
+                <div className="admin-header-actions">
+                    <Link to="/" className="secondary-btn">Browse Market</Link>
+                    <Link to="/customer/requests" className="primary-btn">My Requests</Link>
+                    {isStaff && (
+                        <Link to="/admin/products" className="secondary-btn">Admin Panel</Link>
+                    )}
+                    <button type="button" className="secondary-btn" onClick={handleLogout}>
+                        Log Out
+                    </button>
                 </div>
+            </div>
 
-                <button type="submit" disabled={saving}>
-                    {saving ? 'Saving...' : 'Save'}
-                </button>
-            </form>
+            <div className="admin-form-container" style={{ maxWidth: '600px', margin: '2rem auto' }}>
+                {success && (
+                    <div style={{ padding: '1rem', backgroundColor: '#e6f7ec', color: '#15803d', borderRadius: '8px', marginBottom: '1.5rem', fontWeight: 500 }}>
+                        ✓ {success}
+                    </div>
+                )}
+
+                {error && (
+                    <div className="admin-message error" style={{ marginBottom: '1.5rem' }}>
+                        {error}
+                    </div>
+                )}
+
+                <form className="admin-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="fullName">Full Name</label>
+                        <input
+                            id="fullName"
+                            name="fullName"
+                            type="text"
+                            value={user?.fullName || ''}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="email">Email Address</label>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={user?.email || ''}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="admin-form-actions">
+                        <button
+                            type="submit"
+                            className="primary-btn"
+                            disabled={saving}
+                        >
+                            {saving ? 'Saving...' : 'Update Profile'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }

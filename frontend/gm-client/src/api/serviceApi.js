@@ -1,41 +1,28 @@
-const API_URL = 'http://localhost:5262/api/Services'
+import { API_BASE_URL, getAuthHeaders, parseErrorMessage } from './config'
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('gm_token')
+const API_URL = `${API_BASE_URL}/api/Services`
 
-    return token
-        ? {
-            Authorization: `Bearer ${token}`,
-        }
-        : {}
-}
-
-export const getServices = async (filters = {}) => {
-    const params = new URLSearchParams()
-
-    if (filters.search) params.append('search', filters.search)
-    if (filters.category) params.append('category', filters.category)
-    if (filters.minPrice !== undefined && filters.minPrice !== null) params.append('minPrice', String(filters.minPrice))
-    if (filters.maxPrice !== undefined && filters.maxPrice !== null) params.append('maxPrice', String(filters.maxPrice))
-
-    const url = params.toString() ? `${API_URL}?${params.toString()}` : API_URL
-
-    const response = await fetch(url, {
+export const getServices = async () => {
+    const response = await fetch(API_URL, {
         headers: getAuthHeaders(),
     })
 
     if (!response.ok) {
-        throw new Error('Failed to load services.')
+        const message = await parseErrorMessage(response, 'Failed to load services.')
+        throw new Error(message)
     }
 
     return response.json()
 }
 
 export const getServiceById = async (id) => {
-    const response = await fetch(`${API_URL}/${id}`, { headers: getAuthHeaders() })
+    const response = await fetch(`${API_URL}/${id}`, {
+        headers: getAuthHeaders(),
+    })
 
     if (!response.ok) {
-        throw new Error('Failed to load service.')
+        const message = await parseErrorMessage(response, 'Failed to load service.')
+        throw new Error(message)
     }
 
     return response.json()
@@ -57,8 +44,8 @@ export const createService = async (service, image) => {
     })
 
     if (!response.ok) {
-        const message = await response.text()
-        throw new Error(message || 'Failed to create service.')
+        const message = await parseErrorMessage(response, 'Failed to create service.')
+        throw new Error(message)
     }
 
     return response.json()
@@ -72,7 +59,9 @@ export const updateService = async (id, service, image) => {
     formData.append('price', service.price)
     formData.append('category', service.category)
 
-    if (image) formData.append('image', image)
+    if (image) {
+        formData.append('image', image)
+    }
 
     const response = await fetch(`${API_URL}/${id}`, {
         method: 'PUT',
@@ -81,8 +70,8 @@ export const updateService = async (id, service, image) => {
     })
 
     if (!response.ok) {
-        const message = await response.text()
-        throw new Error(message || 'Failed to update service.')
+        const message = await parseErrorMessage(response, 'Failed to update service.')
+        throw new Error(message)
     }
 }
 
@@ -93,6 +82,7 @@ export const deleteService = async (id) => {
     })
 
     if (!response.ok) {
-        throw new Error('Failed to delete service.')
+        const message = await parseErrorMessage(response, 'Failed to delete service.')
+        throw new Error(message)
     }
 }

@@ -1,22 +1,18 @@
-const API_URL = 'http://localhost:5262/api/Products'
+import { API_BASE_URL, getAuthHeaders, parseErrorMessage } from './config'
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('gm_token')
-
-    return token
-        ? {
-            Authorization: `Bearer ${token}`,
-        }
-        : {}
-}
+const API_URL = `${API_BASE_URL}/api/Products`
 
 export const getProducts = async (filters = {}) => {
     const params = new URLSearchParams()
 
     if (filters.search) params.append('search', filters.search)
     if (filters.category) params.append('category', filters.category)
-    if (filters.minPrice !== undefined && filters.minPrice !== null) params.append('minPrice', String(filters.minPrice))
-    if (filters.maxPrice !== undefined && filters.maxPrice !== null) params.append('maxPrice', String(filters.maxPrice))
+    if (filters.minPrice !== undefined && filters.minPrice !== null && filters.minPrice !== '') {
+        params.append('minPrice', String(filters.minPrice))
+    }
+    if (filters.maxPrice !== undefined && filters.maxPrice !== null && filters.maxPrice !== '') {
+        params.append('maxPrice', String(filters.maxPrice))
+    }
 
     const url = params.toString() ? `${API_URL}?${params.toString()}` : API_URL
 
@@ -25,22 +21,21 @@ export const getProducts = async (filters = {}) => {
     })
 
     if (!response.ok) {
-        throw new Error('Failed to load products.')
+        const message = await parseErrorMessage(response, 'Failed to load products.')
+        throw new Error(message)
     }
 
     return response.json()
 }
 
 export const getProductById = async (id) => {
-    const response = await fetch(
-        `${API_URL}/${id}`,
-        {
-            headers: getAuthHeaders(),
-        }
-    )
+    const response = await fetch(`${API_URL}/${id}`, {
+        headers: getAuthHeaders(),
+    })
 
     if (!response.ok) {
-        throw new Error('Failed to load product.')
+        const message = await parseErrorMessage(response, 'Failed to load product.')
+        throw new Error(message)
     }
 
     return response.json()
@@ -62,17 +57,14 @@ export const createProduct = async (product, image) => {
     })
 
     if (!response.ok) {
-        throw new Error('Failed to create product.')
+        const message = await parseErrorMessage(response, 'Failed to create product.')
+        throw new Error(message)
     }
 
     return response.json()
 }
 
-export const updateProduct = async (
-    id,
-    product,
-    image
-) => {
+export const updateProduct = async (id, product, image) => {
     const formData = new FormData()
 
     formData.append('name', product.name)
@@ -84,30 +76,26 @@ export const updateProduct = async (
         formData.append('image', image)
     }
 
-    const response = await fetch(
-        `${API_URL}/${id}`,
-        {
-            method: 'PUT',
-            headers: getAuthHeaders(),
-            body: formData,
-        }
-    )
+    const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: formData,
+    })
 
     if (!response.ok) {
-        throw new Error('Failed to update product.')
+        const message = await parseErrorMessage(response, 'Failed to update product.')
+        throw new Error(message)
     }
 }
 
 export const deleteProduct = async (id) => {
-    const response = await fetch(
-        `${API_URL}/${id}`,
-        {
-            method: 'DELETE',
-            headers: getAuthHeaders(),
-        }
-    )
+    const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+    })
 
     if (!response.ok) {
-        throw new Error('Failed to delete product.')
+        const message = await parseErrorMessage(response, 'Failed to delete product.')
+        throw new Error(message)
     }
 }

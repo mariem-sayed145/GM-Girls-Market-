@@ -1,9 +1,9 @@
 using GM.API.Models.CustomerRequests;
 using GM.Application.Features.CustomerRequests.Commands.CreateCustomerRequest;
 using GM.Application.Features.CustomerRequests.Commands.UpdateRequestStatus;
+using GM.Application.Features.CustomerRequests.Queries.GetAllRequests;
 using GM.Application.Features.CustomerRequests.Queries.GetMyRequests;
 using GM.Application.Features.CustomerRequests.Queries.GetRequestById;
-using GM.Application.Features.CustomerRequests.Queries.GetMyRequests;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -62,12 +62,12 @@ public class CustomerRequestsController : ControllerBase
         return Ok(list);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Employee,Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         // Management endpoint: returns all customer requests
-        var list = await _mediator.Send(new GM.Application.Features.CustomerRequests.Queries.GetAllRequests.GetAllRequestsQuery(), cancellationToken);
+        var list = await _mediator.Send(new GetAllRequestsQuery(), cancellationToken);
 
         return Ok(list);
     }
@@ -99,7 +99,7 @@ public class CustomerRequestsController : ControllerBase
         return Ok(request);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Employee,Admin")]
     [HttpGet("admin/{id:int}")]
     public async Task<IActionResult> GetByIdAdmin(int id, CancellationToken cancellationToken)
     {
@@ -113,7 +113,7 @@ public class CustomerRequestsController : ControllerBase
         return Ok(request);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Employee,Admin")]
     [HttpPut("{id:int}/status")]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] int status, CancellationToken cancellationToken)
     {

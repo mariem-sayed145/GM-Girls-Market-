@@ -22,7 +22,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = "Employee,Admin")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create(
         [FromForm] CreateServiceRequest request,
@@ -70,7 +70,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize]
+    [Authorize(Roles = "Employee,Admin")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Update(
         int id,
@@ -94,7 +94,7 @@ public class ServicesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await _mediator.Send(new DeleteServiceCommand(id), cancellationToken);

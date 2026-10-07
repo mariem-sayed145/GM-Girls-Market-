@@ -5,6 +5,7 @@ using GM.Application.Features.Products.Commands.UpdateProduct;
 using GM.Application.Features.Products.Queries.GetProductById;
 using GM.Application.Features.Products.Queries.GetProducts;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GM.API.Controllers;
@@ -21,6 +22,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Employee,Admin")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create(
         [FromForm] CreateProductRequest request,
@@ -85,6 +87,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Employee,Admin")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Update(
         int id,
@@ -111,6 +114,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(
         int id,
         CancellationToken cancellationToken)

@@ -32,16 +32,14 @@ public static class DependencyInjection
         services.AddScoped<IServiceRepository,
             ServiceRepository>();
 
-        services.AddScoped<IFileStorageService, FileStorageService>();
-
-        services.AddScoped<IContactInquiryRepository,
-        ContactInquiryRepository>();
-
-        services.AddScoped<IProductRepository,
-            ProductRepository>();
+        services.AddScoped<IDocumentRepository,
+            DocumentRepository>();
 
         services.AddScoped<IFileStorageService,
             FileStorageService>();
+
+        services.AddScoped<IDocumentStorageService,
+            DocumentStorageService>();
 
         services.AddScoped<IPasswordHasher,
            PasswordHasher>();

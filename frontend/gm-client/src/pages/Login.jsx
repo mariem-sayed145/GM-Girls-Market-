@@ -30,10 +30,7 @@ function Login() {
         try {
             const data = await login(formData)
 
-            localStorage.setItem(
-                'gm_token',
-                data.token
-            )
+            localStorage.setItem('gm_token', data.token)
 
             localStorage.setItem(
                 'gm_user',
@@ -41,21 +38,24 @@ function Login() {
                     id: data.id,
                     fullName: data.fullName,
                     email: data.email,
+                    role: data.role,
                 })
             )
 
-            const redirectTo =
-                location.state?.from ||
-                '/admin/products'
+            const isStaff =
+                data.role === 1 ||
+                data.role === 2 ||
+                data.role === 'Employee' ||
+                data.role === 'Admin'
+
+            const defaultRedirect = isStaff ? '/admin/products' : '/customer/dashboard'
+            const redirectTo = location.state?.from || defaultRedirect
 
             navigate(redirectTo, {
                 replace: true,
             })
-        } catch (error) {
-            setError(
-                error.message ||
-                'Invalid email or password.'
-            )
+        } catch (err) {
+            setError(err.message || 'Invalid email or password.')
         } finally {
             setIsSubmitting(false)
         }

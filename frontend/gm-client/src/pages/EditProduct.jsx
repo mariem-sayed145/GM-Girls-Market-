@@ -5,6 +5,7 @@ import {
     getProductById,
     updateProduct,
 } from '../api/productApi'
+import { getImageUrl } from '../api/config'
 
 function EditProduct() {
     const { id } = useParams()
@@ -243,7 +244,7 @@ function EditProduct() {
 
                     {formData.imageUrl && (
                         <img
-                            src={formData.imageUrl}
+                            src={getImageUrl(formData.imageUrl)}
                             alt={formData.name}
                             className="edit-product-preview"
                         />

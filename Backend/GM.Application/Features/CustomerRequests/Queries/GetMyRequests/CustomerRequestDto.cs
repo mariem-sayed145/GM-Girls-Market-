@@ -1,9 +1,2 @@
-namespace GM.Application.Features.CustomerRequests.Queries.GetMyRequests;
+// Moved to GM.Application.Features.CustomerRequests.DTOs.CustomerRequestDto
 
-public record CustomerRequestDto(
-    int Id,
-    int ServiceId,
-    string Description,
-    string Status,
-    DateTime? PreferredDate,
-    DateTime CreatedAt);

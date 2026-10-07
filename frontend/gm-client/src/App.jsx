@@ -16,6 +16,8 @@ import EditService from './pages/EditService'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
+    const adminOrEmployee = ['Admin', 'Employee', 1, 2]
+
     return (
         <BrowserRouter>
             <Routes>
@@ -37,7 +39,7 @@ function App() {
                 <Route
                     path="/admin/products"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={adminOrEmployee}>
                             <AdminProducts />
                         </ProtectedRoute>
                     }
@@ -46,7 +48,7 @@ function App() {
                 <Route
                     path="/admin/products/add"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={adminOrEmployee}>
                             <AddProduct />
                         </ProtectedRoute>
                     }
@@ -55,7 +57,7 @@ function App() {
                 <Route
                     path="/admin/products/edit/:id"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={adminOrEmployee}>
                             <EditProduct />
                         </ProtectedRoute>
                     }
@@ -82,7 +84,7 @@ function App() {
                 <Route
                     path="/admin/requests"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={adminOrEmployee}>
                             <AdminRequests />
                         </ProtectedRoute>
                     }
@@ -91,7 +93,7 @@ function App() {
                 <Route
                     path="/admin/requests/edit/:id"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={adminOrEmployee}>
                             <EditRequest />
                         </ProtectedRoute>
                     }
@@ -100,7 +102,7 @@ function App() {
                 <Route
                     path="/admin/services"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={adminOrEmployee}>
                             <AdminServices />
                         </ProtectedRoute>
                     }
@@ -109,7 +111,7 @@ function App() {
                 <Route
                     path="/admin/services/add"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={adminOrEmployee}>
                             <AddService />
                         </ProtectedRoute>
                     }
@@ -118,7 +120,7 @@ function App() {
                 <Route
                     path="/admin/services/edit/:id"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={adminOrEmployee}>
                             <EditService />
                         </ProtectedRoute>
                     }
