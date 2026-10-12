@@ -22,6 +22,10 @@ public class GMDbContext : DbContext
 
     public DbSet<Document> Documents => Set<Document>();
 
+    public DbSet<Client> Clients => Set<Client>();
+
+    public DbSet<Project> Projects => Set<Project>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
@@ -29,4 +33,4 @@ public class GMDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
     }
-} 
+}

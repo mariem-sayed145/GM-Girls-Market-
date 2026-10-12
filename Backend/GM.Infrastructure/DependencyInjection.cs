@@ -49,6 +49,10 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtService, JwtService>();
 
+        services.AddScoped<IClientRepository, ClientRepository>();
+
+        services.AddScoped<IProjectRepository, ProjectRepository>();
+
         return services;
     }
 }

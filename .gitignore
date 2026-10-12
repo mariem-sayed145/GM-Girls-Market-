@@ -45,3 +45,13 @@ publish/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Node
+node_modules/
+
+# Uploaded files (product/service images, user documents)
+Backend/GM.API/wwwroot/images/products/
+Backend/GM.API/wwwroot/documents/
+
+# Local secrets / developer overrides
+Backend/GM.API/appsettings.Development.json
