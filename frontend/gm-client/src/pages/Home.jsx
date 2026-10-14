@@ -51,6 +51,27 @@ function Home() {
     const [minPrice, setMinPrice] = useState('')
     const [maxPrice, setMaxPrice] = useState('')
     const [categories, setCategories] = useState([])
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+    const handleCategoryClick = async (cat) => {
+        setCategoryFilter(cat)
+        try {
+            setIsLoadingProducts(true)
+            setProductsError('')
+            const data = await getProducts({
+                search: search || undefined,
+                category: cat,
+                minPrice: minPrice ? Number(minPrice) : undefined,
+                maxPrice: maxPrice ? Number(maxPrice) : undefined,
+            })
+            setProducts(data)
+            document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })
+        } catch (error) {
+            setProductsError(error.message || 'Failed to load products.')
+        } finally {
+            setIsLoadingProducts(false)
+        }
+    }
 
     /* =========================
        LOAD PRODUCTS & SERVICES
@@ -180,114 +201,124 @@ function Home() {
             {/* =========================
                 NAVBAR
             ========================= */}
-            <nav className="navbar">
-                <div className="logo">
+            <header className="navbar">
+                <a href="#home" className="logo">
                     <img src="/images/logo.jpg" alt="GM Logo" />
-                    <span>GM</span>
-                </div>
+                    <div className="brand-text">
+                        <span className="brand-title">GM</span>
+                        <span className="brand-subtitle">Girls Market</span>
+                    </div>
+                </a>
 
-                <div className="product-filters">
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-
-                    <select
-                        value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
-                    >
-                        <option value="">All Categories</option>
-                        {categories.map((c) => (
-                            <option key={c} value={c}>
-                                {c}
-                            </option>
-                        ))}
-                    </select>
-
-                    <input
-                        type="number"
-                        placeholder="Min Price"
-                        value={minPrice}
-                        onChange={(e) => setMinPrice(e.target.value)}
-                    />
-
-                    <input
-                        type="number"
-                        placeholder="Max Price"
-                        value={maxPrice}
-                        onChange={(e) => setMaxPrice(e.target.value)}
-                    />
-
-                    <button onClick={applyFilters} className="primary-btn">
-                        Apply
-                    </button>
-                    <button onClick={clearFilters} className="secondary-btn">
-                        Clear
-                    </button>
-                </div>
-
-                <div className="nav-links">
+                <nav className="nav-links">
                     <a href="#home">Home</a>
                     <a href="#categories">Categories</a>
                     <a href="#products">Products</a>
                     <a href="#services">Services</a>
                     <a href="#contact">Contact</a>
+                </nav>
+
+                <div className="nav-actions">
+                    <div className="nav-auth">
+                        {!token ? (
+                            <>
+                                <Link to="/login" className="nav-auth-link">Login</Link>
+                                <Link to="/register" className="nav-auth-btn">Register</Link>
+                            </>
+                        ) : (
+                            <>
+                                {isStaff ? (
+                                    <Link to="/admin/products" className="nav-auth-badge staff">
+                                        Admin Panel
+                                    </Link>
+                                ) : (
+                                    <Link to="/customer/dashboard" className="nav-auth-badge">
+                                        Dashboard
+                                    </Link>
+                                )}
+                                <button className="nav-logout-btn" onClick={handleLogout} title="Log out">
+                                    Logout
+                                </button>
+                            </>
+                        )}
+                    </div>
+
+                    <button
+                        className="nav-cta-btn"
+                        onClick={() =>
+                            document
+                                .getElementById('contact')
+                                ?.scrollIntoView({ behavior: 'smooth' })
+                        }
+                    >
+                        Get in Touch
+                    </button>
+
+                    <button
+                        className="mobile-menu-btn"
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label="Toggle navigation menu"
+                    >
+                        {mobileMenuOpen ? '✕' : '☰'}
+                    </button>
                 </div>
 
-                <div className="nav-auth">
-                    {!token ? (
-                        <>
-                            <Link to="/login">Login</Link>
-                            <Link to="/register">Register</Link>
-                        </>
-                    ) : (
-                        <>
-                            {isStaff ? (
-                                <Link to="/admin/products">Admin Panel</Link>
+                {mobileMenuOpen && (
+                    <div className="mobile-nav-drawer">
+                        <a href="#home" onClick={() => setMobileMenuOpen(false)}>Home</a>
+                        <a href="#categories" onClick={() => setMobileMenuOpen(false)}>Categories</a>
+                        <a href="#products" onClick={() => setMobileMenuOpen(false)}>Products</a>
+                        <a href="#services" onClick={() => setMobileMenuOpen(false)}>Services</a>
+                        <a href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+                        <div className="mobile-drawer-auth">
+                            {!token ? (
+                                <>
+                                    <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Login</Link>
+                                    <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="mobile-drawer-btn">
+                                        Create Account
+                                    </Link>
+                                </>
                             ) : (
-                                <Link to="/customer/dashboard">Dashboard</Link>
+                                <>
+                                    {isStaff ? (
+                                        <Link to="/admin/products" onClick={() => setMobileMenuOpen(false)}>
+                                            Admin Panel
+                                        </Link>
+                                    ) : (
+                                        <Link to="/customer/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                                            Customer Dashboard
+                                        </Link>
+                                    )}
+                                    <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }}>
+                                        Logout
+                                    </button>
+                                </>
                             )}
-                            <button className="nav-logout" onClick={handleLogout}>
-                                Logout
-                            </button>
-                        </>
-                    )}
-                </div>
-
-                <button
-                    className="nav-btn"
-                    onClick={() =>
-                        document
-                            .getElementById('contact')
-                            ?.scrollIntoView({ behavior: 'smooth' })
-                    }
-                >
-                    Get in Touch
-                </button>
-            </nav>
+                        </div>
+                    </div>
+                )}
+            </header>
 
             {/* =========================
                 HERO
             ========================= */}
             <section className="hero" id="home">
                 <div className="hero-content">
-                    <span className="hero-tag">Made for girls, by girls</span>
+                    <span className="hero-tag">Handcrafted • Beauty • Fashion</span>
 
                     <h1>
-                        Discover
-                        <span> Something </span>
-                        You'll Love.
+                        Curated Elegance,
+                        <span> Handcrafted </span>
+                        with Love.
                     </h1>
 
                     <p>
-                        Discover unique fashion, accessories, handmade products, and services from talented women around you.
+                        Discover beautiful accessories, bespoke fashion, personalized gifts, and creative services crafted by empowered women.
                     </p>
 
                     <div className="hero-buttons">
                         <a href="#products" className="primary-btn">
-                            Explore Products
+                            Shop Products
                         </a>
                         <a href="#services" className="secondary-btn">
                             Explore Services
@@ -297,9 +328,9 @@ function Home() {
 
                 <div className="hero-image">
                     <div className="circle"></div>
-                    <img src="/images/logo.jpg" alt="GM" />
-                    <div className="floating-card card-one">New Collection</div>
-                    <div className="floating-card card-two">Best Seller</div>
+                    <img src="/images/logo.jpg" alt="Girls Market Collection" />
+                    <div className="floating-card card-one">Handcrafted</div>
+                    <div className="floating-card card-two">Premium Quality</div>
                 </div>
             </section>
 
@@ -308,24 +339,48 @@ function Home() {
             ========================= */}
             <section className="categories" id="categories">
                 <div className="section-title">
-                    <span>EXPLORE</span>
+                    <span>COLLECTIONS</span>
                     <h2>Shop by Category</h2>
-                    <p>Find something that matches your style.</p>
+                    <p>Select a collection to filter our handcrafted items.</p>
                 </div>
 
                 <div className="category-grid">
-                    <a href="#products" className="category-card">
+                    <button
+                        type="button"
+                        className={`category-card ${categoryFilter === 'Fashion' ? 'active' : ''}`}
+                        onClick={() => handleCategoryClick('Fashion')}
+                    >
+                        <span className="category-icon">✦</span>
                         <h3>Fashion</h3>
-                    </a>
-                    <a href="#products" className="category-card">
+                        <span className="category-action">View Pieces →</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`category-card ${categoryFilter === 'Accessories' ? 'active' : ''}`}
+                        onClick={() => handleCategoryClick('Accessories')}
+                    >
+                        <span className="category-icon">✧</span>
                         <h3>Accessories</h3>
-                    </a>
-                    <a href="#products" className="category-card">
+                        <span className="category-action">View Pieces →</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`category-card ${categoryFilter === 'Bags' ? 'active' : ''}`}
+                        onClick={() => handleCategoryClick('Bags')}
+                    >
+                        <span className="category-icon">✦</span>
                         <h3>Bags</h3>
-                    </a>
-                    <a href="#products" className="category-card">
+                        <span className="category-action">View Pieces →</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`category-card ${categoryFilter === 'Gifts' ? 'active' : ''}`}
+                        onClick={() => handleCategoryClick('Gifts')}
+                    >
+                        <span className="category-icon">✧</span>
                         <h3>Gifts</h3>
-                    </a>
+                        <span className="category-action">View Pieces →</span>
+                    </button>
                 </div>
             </section>
 
@@ -334,9 +389,66 @@ function Home() {
             ========================= */}
             <section className="products" id="products">
                 <div className="section-title">
-                    <span>OUR FAVORITES</span>
-                    <h2>Best Sellers & Products</h2>
-                    <p>The pieces everyone is loving right now.</p>
+                    <span>OUR CATALOG</span>
+                    <h2>Products & Best Sellers</h2>
+                    <p>Discover unique treasures crafted with passion and detail.</p>
+                </div>
+
+                {/* DEDICATED PRODUCT FILTERS */}
+                <div className="product-filters-bar">
+                    <div className="filter-field search-field">
+                        <span className="filter-icon">🔍</span>
+                        <input
+                            type="text"
+                            placeholder="Search by keyword..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
+                        />
+                    </div>
+
+                    <div className="filter-field">
+                        <select
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                        >
+                            <option value="">All Categories</option>
+                            {categories.map((c) => (
+                                <option key={c} value={c}>
+                                    {c}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="filter-field price-field">
+                        <input
+                            type="number"
+                            placeholder="Min (EGP)"
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="filter-field price-field">
+                        <input
+                            type="number"
+                            placeholder="Max (EGP)"
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="filter-buttons">
+                        <button onClick={applyFilters} className="primary-btn filter-btn">
+                            Filter
+                        </button>
+                        {(search || categoryFilter || minPrice || maxPrice) && (
+                            <button onClick={clearFilters} className="secondary-btn clear-btn">
+                                Reset
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="product-grid">

@@ -234,9 +234,11 @@ function CustomerRequests() {
                                     )}
                                 </div>
 
-                                <strong style={{ textTransform: 'capitalize' }}>
-                                    Status: {r.status}
-                                </strong>
+                                <div>
+                                    <span className={`status-pill status-${String(r.status).toLowerCase()}`}>
+                                        {r.status}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     ))}

@@ -92,7 +92,11 @@ function AdminRequests() {
                                     )}
                                 </div>
 
-                                <strong>Status: {r.status}</strong>
+                                <div>
+                                    <span className={`status-pill status-${String(r.status).toLowerCase()}`}>
+                                        {r.status}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     ))}
