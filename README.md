@@ -1,34 +1,35 @@
 # GM — Girls Market
 
-**Girls Market (GM)** is a full-stack marketplace web application that connects customers with talented women offering fashion, accessories, bags, gifts, and handmade services. It was developed as the final project of a Full-Stack development track.
+**Girls Market (GM)** is a full-stack marketplace web application that connects customers with talented women offering fashion, accessories, bags, gifts, and handmade services.
 
 ---
 
 ## 1. Project Overview
 
-GM allows customers to browse products and services, submit service requests, manage their account profile, and upload personal documents. Admin and Employee users can manage the product catalogue, services, and customer requests through a protected admin panel.
+GM allows customers to browse handcrafted products and services, submit and track custom service requests, manage their account profile, and securely upload personal documents. Admin and Employee users manage the product catalogue, services, and customer requests through a role-protected administrative panel.
 
 ---
 
 ## 2. Main Features
 
 ### Public / Customer
-- Responsive landing page with hero, product showcase, service listing, and contact form
-- Product search with filters (keyword, category, min/max price)
-- Browse services
-- Contact/inquiry form backed by the database
-- User registration and login
-- Customer dashboard: view and update profile
-- Customer service requests: submit, view own requests
-- Document upload and management (authenticated)
-- Protected routes redirect unauthenticated users to login
+- **Showcase & Discovery**: Responsive landing page with hero banner, product catalogue, service showcase, and interactive contact form.
+- **Search & Filtering**: Search products by keyword, category, and minimum/maximum price bounds.
+- **Service Requests**: Logged-in customers submit service requests with optional preferred dates and track status updates (Pending, InProgress, Completed, Cancelled).
+- **Customer Dashboard**: View and update profile details (Full Name, Email).
+- **Document Management**: Secure upload, listing, and download of documents with MIME-type and size validation (up to 10 MB).
+- **Inquiry Handling**: Database-persisted contact inquiries.
+- **Protected Routing**: Automatic redirect of unauthenticated visitors to login.
 
-### Admin / Employee
-- Products: create, update, delete (with image upload)
-- Services: create, update, delete (with image upload)
-- Customer requests: view all, update status
-- Role-based access control (Customer = 0, Employee = 1, Admin = 2)
-- Swagger/OpenAPI UI available in Development mode
+### Admin & Staff Management
+- **Product Management**: Create, edit, and delete products with image upload and validation.
+- **Service Management**: Create, edit, and delete service offerings with image upload.
+- **Customer Request Workflow**: Inspect all incoming customer requests and transition request statuses.
+- **Role-Based Access Control**:
+  - `Customer` (0): Browse, request services, manage profile & own documents.
+  - `Employee` (1): Manage products, services, and update request progress.
+  - `Admin` (2): Full administrative authority including deletion of products and services.
+- **Interactive Documentation**: Swagger/OpenAPI documentation in Development mode.
 
 ---
 
@@ -36,41 +37,45 @@ GM allows customers to browse products and services, submit service requests, ma
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, Vite 8, React Router DOM 7, Vanilla CSS |
-| Backend | ASP.NET Core Web API (.NET 10) |
-| Architecture | Clean Architecture (Domain / Application / Infrastructure / API) |
-| Messaging | MediatR, FluentValidation |
-| Database | Microsoft SQL Server |
-| ORM | Entity Framework Core 10 |
-| Auth | JWT Bearer tokens |
-| File Storage | Local file system (wwwroot) |
+| **Frontend** | React 19, Vite 8, React Router DOM 7, Vanilla CSS |
+| **Backend** | ASP.NET Core Web API (.NET 10) |
+| **Architecture** | Clean Architecture (Domain / Application / Infrastructure / API / Tests) |
+| **Design Patterns & Tools** | CQRS with MediatR, FluentValidation pipeline behaviors |
+| **Database** | Microsoft SQL Server |
+| **ORM** | Entity Framework Core 10 |
+| **Authentication** | JWT Bearer Tokens, ASP.NET Core Identity PasswordHasher (PBKDF2-HMAC-SHA256) |
+| **Testing** | xUnit, .NET Test SDK |
+| **Static Assets** | Local physical file storage via ASP.NET Core `wwwroot` |
 
 ---
 
 ## 4. Architecture Overview
 
+The solution adheres strictly to Clean Architecture principles:
+
 ```
-GM.Domain          — Entities (Product, Service, User, CustomerRequest, Document, Client, Project)
-                     Enums (UserRole, RequestStatus, ProjectStatus)
-                     BaseEntity (Id, CreatedAt, UpdatedAt)
+GM.Domain
+  ├── Entities: Product, Service, User, CustomerRequest, Document, Client, Project, ProjectMember
+  ├── Enums: UserRole, RequestStatus, ProjectStatus
+  └── Common: BaseEntity (Id, CreatedAt, UpdatedAt)
 
-GM.Application     — MediatR Commands & Queries per feature
-                     FluentValidation validators
-                     Repository interfaces (IProductRepository, IUserRepository, …)
-                     Service interfaces (IJwtService, IPasswordHasher, IFileStorageService, IDocumentStorageService)
-                     ValidationBehavior pipeline
+GM.Application
+  ├── Features: Commands, Queries, DTOs, and Validators per feature
+  ├── Abstractions: Repository and Service interfaces
+  └── Behaviors: ValidationBehavior pipeline for MediatR
 
-GM.Infrastructure  — EF Core GMDbContext with all entity configurations
-                     Repository implementations
-                     JwtService, PasswordHasher, FileStorageService, DocumentStorageService
-                     EF Core migrations
+GM.Infrastructure
+  ├── Persistence: GMDbContext, EF Core Configurations, Repositories
+  ├── Migrations: EF Core Schema Migrations
+  └── Services: JwtService, PasswordHasher, FileStorageService, DocumentStorageService
 
-GM.API             — ASP.NET Core Web API controllers
-                     JWT Bearer authentication middleware
-                     ExceptionHandlingMiddleware (400/401/404/409/500)
-                     CORS policy for the React frontend (http://localhost:5173)
-                     Swagger/OpenAPI (Development only)
-                     Static file serving (product & service images)
+GM.API
+  ├── Controllers: AuthController, ProductsController, ServicesController, CustomerRequestsController, DocumentsController, ContactController
+  ├── Middleware: ExceptionHandlingMiddleware (structured 400/401/404/409/500 responses)
+  └── Configuration: Program.cs, configurable CORS, JWT authentication, Swagger
+
+GM.Tests
+  └── xUnit test suite for Domain entities, FluentValidation validators, and Security components
 ```
 
 ---
@@ -82,71 +87,70 @@ GM-Girls-Market-/
 ├── Backend/
 │   ├── GM.slnx
 │   ├── GM.API/
-│   │   ├── Controllers/        AuthController, ProductsController, ServicesController,
-│   │   │                       CustomerRequestsController, DocumentsController, ContactController
-│   │   ├── Middleware/         ExceptionHandlingMiddleware
-│   │   ├── Models/             Request DTOs per feature
-│   │   ├── appsettings.json
-│   │   └── Program.cs
+│   │   ├── Controllers/             API Controllers
+│   │   ├── Middleware/              ExceptionHandlingMiddleware
+│   │   ├── Models/                  Request/Response DTO models
+│   │   ├── wwwroot/                 Static assets and image storage
+│   │   ├── appsettings.json         Default configuration
+│   │   ├── appsettings.Production.json.example
+│   │   └── Program.cs               Application entry point
 │   ├── GM.Application/
-│   │   ├── Features/           Authentication, Products, Services, CustomerRequests,
-│   │   │                       Documents, Clients, Projects, ContactInquiries
-│   │   ├── Abstractions/       IProductRepository, IUserRepository, IJwtService, …
-│   │   └── Behaviors/          ValidationBehavior
+│   │   ├── Features/                Feature slices (CQRS + FluentValidation)
+│   │   ├── Abstractions/            Interfaces for persistence and services
+│   │   └── Behaviors/               MediatR Pipeline Behaviors
 │   ├── GM.Domain/
-│   │   ├── Entities/           Product, Service, User, CustomerRequest, Document, Client, Project, ProjectMember
-│   │   ├── Enums/              UserRole, RequestStatus, ProjectStatus
-│   │   └── Common/             BaseEntity
-│   └── GM.Infrastructure/
-│       ├── Persistence/        GMDbContext, entity configurations, repositories
-│       ├── Migrations/         EF Core migration files
-│       ├── Authentication/     JwtService
-│       └── Services/           FileStorageService, DocumentStorageService, PasswordHasher
+│   │   ├── Entities/                Core domain models
+│   │   ├── Enums/                   Domain enumerations
+│   │   └── Common/                  BaseEntity
+│   ├── GM.Infrastructure/
+│   │   ├── Persistence/             GMDbContext, Configurations, Repositories
+│   │   ├── Migrations/              EF Core database migrations
+│   │   ├── Authentication/          JwtService
+│   │   └── Services/                File & Document storage, PasswordHasher
+│   └── GM.Tests/
+│       └── UnitTest1.cs             Automated unit tests
 └── frontend/
     └── gm-client/
+        ├── public/                  Static assets, images, and _redirects
         ├── src/
-        │   ├── api/            authApi.js, productApi.js, serviceApi.js,
-        │   │                   requestApi.js, contactApi.js, documentApi.js, config.js
-        │   ├── components/     ProtectedRoute.jsx
-        │   └── pages/          Home, Login, Register, CustomerDashboard, CustomerRequests,
-        │                       AdminProducts, AddProduct, EditProduct,
-        │                       AdminServices, AddService, EditService,
-        │                       AdminRequests, EditRequest
-        ├── public/images/      logo.jpg and sample product images
-        └── package.json
+        │   ├── api/                 API clients with dynamic base URL support
+        │   ├── components/          ProtectedRoute and reusable components
+        │   ├── pages/               Page components (Home, Admin, Customer, Auth)
+        │   ├── App.jsx              Router configuration
+        │   └── App.css              Design system and styles
+        ├── .env.example             Frontend environment template
+        ├── package.json
+        └── vite.config.js
 ```
 
 ---
 
 ## 6. Prerequisites
 
-| Tool | Version |
+| Tool | Recommended Version |
 |---|---|
-| .NET SDK | 10.0 or later |
-| Node.js | 18+ |
-| npm | 9+ |
-| SQL Server | 2019+ (or SQL Server Express / LocalDB) |
-| dotnet-ef CLI | 10.0.x (`dotnet tool install -g dotnet-ef`) |
+| **.NET SDK** | 10.0 or later |
+| **Node.js** | 18+ or 20+ LTS |
+| **npm** | 9+ |
+| **Microsoft SQL Server** | 2019, 2022, or SQL Server Express / LocalDB |
+| **dotnet-ef CLI** | 10.0.x (`dotnet tool install -g dotnet-ef`) |
 
 ---
 
 ## 7. Installation Instructions
 
-### Clone the repository
-
+### 1. Clone the repository
 ```bash
 git clone https://github.com/mariem-sayed145/GM-Girls-Market-.git
 cd GM-Girls-Market-
 ```
 
-### Restore backend dependencies
-
+### 2. Restore backend dependencies
 ```bash
 dotnet restore Backend/GM.slnx
 ```
 
-### Install frontend dependencies
-
+### 3. Install frontend dependencies
 ```bash
 cd frontend/gm-client
 npm install
@@ -157,229 +161,221 @@ cd ../..
 
 ## 8. Environment Variables
 
-### Backend
+### Backend Configuration
 
-All configuration is in [`Backend/GM.API/appsettings.json`](Backend/GM.API/appsettings.json).
+Configuration is loaded from [`Backend/GM.API/appsettings.json`](Backend/GM.API/appsettings.json) or environment variables:
 
-For local development, override values in `appsettings.Development.json` (this file is in `.gitignore`).
+| Setting Key | Environment Variable Equivalent | Description |
+|---|---|---|
+| `ConnectionStrings:DefaultConnection` | `ConnectionStrings__DefaultConnection` | SQL Server connection string |
+| `Jwt:Key` | `Jwt__Key` | Secret key used for signing JWT tokens (min 256 bits) |
+| `Jwt:Issuer` | `Jwt__Issuer` | Token issuer (default: `GM.API`) |
+| `Jwt:Audience` | `Jwt__Audience` | Token audience (default: `GM.Client`) |
+| `Jwt:ExpirationMinutes` | `Jwt__ExpirationMinutes` | Token validity period in minutes (default: `60`) |
+| `Cors:AllowedOrigins` | `Cors__AllowedOrigins__0`, etc. | Allowed frontend origins (array) |
 
-| Key | Description |
-|---|---|
-| `ConnectionStrings:DefaultConnection` | SQL Server connection string |
-| `Jwt:Key` | Secret key used to sign JWT tokens (change in production) |
-| `Jwt:Issuer` | Token issuer — default `GM.API` |
-| `Jwt:Audience` | Token audience — default `GM.Client` |
-| `Jwt:ExpirationMinutes` | Token lifetime in minutes — default `60` |
+A production template is available in [`Backend/GM.API/appsettings.Production.json.example`](Backend/GM.API/appsettings.Production.json.example).
 
-**Default connection string (Windows Auth / trusted connection):**
-```json
-"Server=localhost;Database=GMDb;Trusted_Connection=True;TrustServerCertificate=True;"
+### Frontend Configuration
+
+Copy the example file to `.env`:
+```bash
+cd frontend/gm-client
+cp .env.example .env
 ```
 
-### Frontend
-
-The frontend API base URL is configured in [`frontend/gm-client/src/api/config.js`](frontend/gm-client/src/api/config.js):
-
-```js
-export const API_BASE_URL = 'http://localhost:5262'
-```
-
-A `.env.example` is provided at `frontend/gm-client/.env.example` for reference.
-
-> **Never commit real credentials.** The `appsettings.Development.json` file is `.gitignore`d.
+| Variable | Description | Default |
+|---|---|---|
+| `VITE_API_BASE_URL` | Base URL of the ASP.NET Core API without trailing slash | `http://localhost:5262` |
 
 ---
 
-## 9. SQL Server Database Setup
+## 9. SQL Server Setup
 
-1. Ensure SQL Server is running locally.
-2. The connection string in `appsettings.json` uses Windows Authentication (`Trusted_Connection=True`). No username/password is required for a local default instance.
-3. The database `GMDb` will be created automatically when you apply migrations.
-
-To use SQL Server Express named instance, update the connection string:
-```
-Server=localhost\SQLEXPRESS;Database=GMDb;Trusted_Connection=True;TrustServerCertificate=True;
-```
+1. Verify Microsoft SQL Server is running:
+   ```powershell
+   Get-Service -Name "*MSSQL*"
+   ```
+2. The default connection string uses Windows Authentication (`Trusted_Connection=True`):
+   ```json
+   "Server=localhost;Database=GMDb;Trusted_Connection=True;TrustServerCertificate=True;"
+   ```
+3. If using a named SQL Server Express instance:
+   ```json
+   "Server=localhost\\SQLEXPRESS;Database=GMDb;Trusted_Connection=True;TrustServerCertificate=True;"
+   ```
 
 ---
 
-## 10. EF Core Migration Instructions
+## 10. Entity Framework Core Migrations
 
-All migrations are already committed. Apply them to create (or update) the database:
+All database schema migrations are committed in the repository. To create or update the database schema:
 
 ```bash
-dotnet ef database update \
-  --project Backend/GM.Infrastructure \
-  --startup-project Backend/GM.API
+dotnet ef database update --project Backend/GM.Infrastructure --startup-project Backend/GM.API
 ```
 
-**Current migrations:**
-| Migration | Description |
-|---|---|
-| `20260910121745_InitialCreate` | ContactInquiries table |
-| `20260913190844_AddProductsTable` | Products table |
-| `20260918183203_AddUsersTable` | Users table with unique email index |
-| `20261012184547_AddClientsProjectsDocumentsCustomerRequests` | Clients, Projects, ProjectMembers, Services, Documents, CustomerRequests tables; Role column on Users |
+### Committed Migrations
+1. `20260910121745_InitialCreate` — `ContactInquiries` table.
+2. `20260913190844_AddProductsTable` — `Products` table.
+3. `20260918183203_AddUsersTable` — `Users` table with unique email index.
+4. `20261012184547_AddClientsProjectsDocumentsCustomerRequests` — `Clients`, `Projects`, `ProjectMembers`, `Services`, `Documents`, and `CustomerRequests` tables; added `Role` column to `Users`.
 
-> **Do not run `dotnet ef database drop`** — it will destroy existing data.
+> **Important**: Never run `database drop` in shared or production environments.
 
 ---
 
-## 11. How to Run the ASP.NET Core Backend
+## 11. Running the Backend
 
-```bash
-cd Backend
-dotnet run --project GM.API
-```
-
-Or from the repository root:
-
+From the repository root:
 ```bash
 dotnet run --project Backend/GM.API
 ```
 
-The API starts on:
-- `http://localhost:5262` (HTTP profile)
-- `https://localhost:7184` (HTTPS profile)
-
-To use the HTTP profile explicitly:
-
-```bash
-dotnet run --project Backend/GM.API --launch-profile http
-```
+By default, the backend listens on:
+- HTTP: `http://localhost:5262`
+- HTTPS: `https://localhost:7184`
 
 ---
 
-## 12. How to Run the React Frontend
+## 12. Running the Frontend
 
+From the repository root:
 ```bash
 cd frontend/gm-client
 npm run dev
 ```
 
-The frontend runs on **http://localhost:5173** by default.
-
-The CORS policy on the backend allows requests from `http://localhost:5173`.
+The frontend launches at **http://localhost:5173**.
 
 ---
 
-## 13. API and Swagger Information
+## 13. API Endpoints
 
-Swagger UI is available when the backend is running in Development mode:
+Interactive Swagger documentation is available in Development mode at `http://localhost:5262/swagger`.
 
-```
-http://localhost:5262/swagger
-```
+### Key Endpoints:
 
-### API Endpoints Summary
-
-| Controller | Endpoint | Auth Required | Description |
+| Method | Endpoint | Authorization | Description |
 |---|---|---|---|
-| **Auth** | `POST /api/Auth/register` | No | Register a new user |
-| | `POST /api/Auth/login` | No | Log in, receive JWT |
-| | `GET /api/Auth/me` | Yes | Get current user profile |
-| | `PUT /api/Auth/me` | Yes | Update current user profile |
-| **Products** | `GET /api/Products` | No | List/search products |
-| | `GET /api/Products/{id}` | No | Get product by ID |
-| | `POST /api/Products` | Employee/Admin | Create product (multipart/form-data) |
-| | `PUT /api/Products/{id}` | Employee/Admin | Update product |
-| | `DELETE /api/Products/{id}` | Admin only | Delete product |
-| **Services** | `GET /api/Services` | No | List all services |
-| | `GET /api/Services/{id}` | No | Get service by ID |
-| | `POST /api/Services` | Employee/Admin | Create service (multipart/form-data) |
-| | `PUT /api/Services/{id}` | Employee/Admin | Update service |
-| | `DELETE /api/Services/{id}` | Admin only | Delete service |
-| **CustomerRequests** | `POST /api/CustomerRequests` | Yes | Submit a service request |
-| | `GET /api/CustomerRequests/my` | Yes | Get own requests |
-| | `GET /api/CustomerRequests` | Employee/Admin | Get all requests |
-| | `GET /api/CustomerRequests/{id}` | Yes (owner) | Get own request by ID |
-| | `GET /api/CustomerRequests/admin/{id}` | Employee/Admin | Get any request by ID |
-| | `PUT /api/CustomerRequests/{id}/status` | Employee/Admin | Update request status |
-| **Documents** | `POST /api/Documents` | Yes | Upload a document |
-| | `GET /api/Documents/my` | Yes | List own documents |
-| | `GET /api/Documents/{id}/download` | Yes | Download own document |
-| | `DELETE /api/Documents/{id}` | Yes (owner) | Delete own document |
-| **Contact** | `POST /api/Contact` | No | Submit contact inquiry |
+| `POST` | `/api/Auth/register` | Anonymous | Register customer account |
+| `POST` | `/api/Auth/login` | Anonymous | Authenticate & retrieve JWT |
+| `GET` | `/api/Auth/me` | Authenticated | Fetch current profile |
+| `PUT` | `/api/Auth/me` | Authenticated | Update current profile |
+| `GET` | `/api/Products` | Anonymous | List/filter products |
+| `GET` | `/api/Products/{id}` | Anonymous | Get product by ID |
+| `POST` | `/api/Products` | Employee, Admin | Add new product (multipart/form-data) |
+| `PUT` | `/api/Products/{id}` | Employee, Admin | Update product (multipart/form-data) |
+| `DELETE` | `/api/Products/{id}` | Admin | Delete product |
+| `GET` | `/api/Services` | Anonymous | List services |
+| `GET` | `/api/Services/{id}` | Anonymous | Get service by ID |
+| `POST` | `/api/Services` | Employee, Admin | Create service (multipart/form-data) |
+| `PUT` | `/api/Services/{id}` | Employee, Admin | Update service (multipart/form-data) |
+| `DELETE` | `/api/Services/{id}` | Admin | Delete service |
+| `POST` | `/api/CustomerRequests` | Authenticated | Submit service request |
+| `GET` | `/api/CustomerRequests/my` | Authenticated | List own service requests |
+| `GET` | `/api/CustomerRequests` | Employee, Admin | List all requests |
+| `GET` | `/api/CustomerRequests/{id}` | Authenticated (Owner) | Get own request details |
+| `GET` | `/api/CustomerRequests/admin/{id}` | Employee, Admin | Get any request details |
+| `PUT` | `/api/CustomerRequests/{id}/status` | Employee, Admin | Update request status (0-3) |
+| `POST` | `/api/Documents` | Authenticated | Upload document (PDF, DOCX, JPG, etc.) |
+| `GET` | `/api/Documents/my` | Authenticated | List own documents |
+| `GET` | `/api/Documents/{id}/download` | Authenticated (Owner) | Secure document stream |
+| `DELETE` | `/api/Documents/{id}` | Authenticated (Owner) | Delete document |
+| `POST` | `/api/Contact` | Anonymous | Submit contact inquiry |
 
 ---
 
-## 14. Authentication Overview
+## 14. Authentication and Authorization
 
-- **Mechanism**: JWT Bearer tokens stored in `localStorage` under the key `gm_token`.
-- **Registration**: `POST /api/Auth/register` — hashes password with BCrypt (PBKDF2), creates user with `Customer` role.
-- **Login**: `POST /api/Auth/login` — verifies credentials, returns JWT + user info.
-- **Token**: Contains `NameIdentifier` (user ID), `Email`, `Name`, `Role` claims.
-- **Protected routes (frontend)**: `ProtectedRoute` component checks `localStorage` for the token and user role before rendering.
-- **Protected endpoints (backend)**: `[Authorize]` and `[Authorize(Roles = "Employee,Admin")]` attributes enforced by ASP.NET Core JWT middleware.
-- **Logout**: Client clears `gm_token` and `gm_user` from `localStorage`.
-- **Role values**: `Customer = 0`, `Employee = 1`, `Admin = 2`.
-
----
-
-## 15. How to Run Tests
-
-There are currently no automated test projects in the repository. Manual testing can be performed via:
-
-- **Swagger UI**: `http://localhost:5262/swagger` (run backend in Development mode)
-- **Browser**: Navigate to `http://localhost:5173` with both servers running
-- **API client**: Any HTTP client (e.g., Postman) using the endpoints listed in Section 13
+- **Authentication**: JWT Bearer tokens passed via the `Authorization: Bearer <token>` HTTP header.
+- **Password Security**: Managed using ASP.NET Core Identity's PBKDF2 implementation with unique salt hashing.
+- **Client Storage**: Tokens are stored in browser `localStorage` under `gm_token`. User metadata is stored under `gm_user`.
+- **RBAC Roles**:
+  - `Customer` (`0`): default role on self-registration.
+  - `Employee` (`1`): elevated rights to manage catalog and customer requests.
+  - `Admin` (`2`): highest authority with deletion rights.
+- **Backend Protection**: Endpoints enforce role checks independently (`[Authorize(Roles = "Employee,Admin")]`).
 
 ---
 
-## 16. Common Issues and Troubleshooting
+## 15. Testing
 
-### Backend does not start
-- Ensure SQL Server is running.
-- Verify the connection string in `appsettings.json` matches your instance name.
-- Run `dotnet ef database update` before starting the API.
-- Check the `Jwt:Key` value is present in configuration.
-
-### "Cannot connect to database"
-- Check SQL Server service is running (`services.msc` → SQL Server).
-- For named instances, use `Server=localhost\SQLEXPRESS` in the connection string.
-- Ensure `TrustServerCertificate=True` is set in the connection string.
-
-### Frontend shows "Failed to load products" (network error)
-- Confirm the backend is running on `http://localhost:5262`.
-- Check browser console for CORS errors — ensure the frontend is accessed at `http://localhost:5173`.
-- The CORS policy in `Program.cs` allows only `http://localhost:5173`.
-
-### JWT token rejected (401 Unauthorized)
-- Log out and log in again to get a fresh token.
-- The default token lifetime is 60 minutes (`Jwt:ExpirationMinutes`).
-
-### Product/Service images not loading
-- The backend serves images from `Backend/GM.API/wwwroot/images/products/`.
-- Static files are only served when the `wwwroot` folder exists. Create it if missing.
-- Image URLs from the API follow the pattern `/images/products/{guid}.ext`.
-
-### Migration already exists error
-- Do not run `dotnet ef migrations add` again without first checking `dotnet ef migrations list`.
-- All required migrations are already committed.
-
-### "Role column missing" on Users table
-- This was added in the `AddClientsProjectsDocumentsCustomerRequests` migration.
-- Run `dotnet ef database update` to apply it.
-
----
-
-## Running Both Servers
-
-Open two terminals:
-
-**Terminal 1 — Backend:**
+### Run Backend Automated Tests
 ```bash
-dotnet run --project Backend/GM.API
+dotnet test Backend/GM.slnx
 ```
+Runs the xUnit test suite in `GM.Tests` verifying:
+- User entity initialization and role assignment
+- CustomerRequest lifecycle and status transitions
+- Input validation (Registration, Products, Services, Requests)
+- PasswordHasher hashing and verification algorithms
 
-**Terminal 2 — Frontend:**
+### Run Frontend Linting & Checks
 ```bash
 cd frontend/gm-client
-npm run dev
+npm run lint
 ```
-
-Then open **http://localhost:5173** in your browser.
+Runs `oxlint` with 0 warnings and 0 errors.
 
 ---
 
-© 2026 Girls Market — Made with love.
+## 16. Production Build
+
+### Frontend Production Bundle
+```bash
+cd frontend/gm-client
+npm run build
+```
+Generates optimized static assets in `frontend/gm-client/dist/`.
+
+### Backend Publication
+```bash
+dotnet publish Backend/GM.API/GM.API.csproj -c Release -o Backend/GM.API/bin/Release/net10.0/publish
+```
+Produces self-contained or framework-dependent production binaries in the output directory.
+
+---
+
+## 17. Deployment Considerations
+
+### 1. Database Hosting (SQL Server)
+- Local SQL Server (`localhost`) is only accessible on your development machine.
+- For cloud deployment, provision a managed SQL Server instance (e.g. Azure SQL Database, AWS RDS for SQL Server, or a hosted SQL Server container/VM).
+- Set `ConnectionStrings__DefaultConnection` in the hosting environment variables.
+
+### 2. Secrets Management
+- Set `Jwt__Key` in your hosting platform's Secret Manager with a high-entropy string (e.g. 64-character hex or base64).
+- Do not commit production connection strings or JWT keys to source control.
+
+### 3. CORS Configuration
+- In production, set `Cors__AllowedOrigins__0` to your actual frontend domain (e.g. `https://girlsmarket.com`).
+
+### 4. SPA Client Routing
+- When deploying the React frontend on Netlify, Cloudflare Pages, or Vercel, client routes require rewrite fallback to `/index.html`.
+- A [`public/_redirects`](frontend/gm-client/public/_redirects) file is included for automatic SPA routing compatibility.
+
+---
+
+## 18. Common Issues and Troubleshooting
+
+### Backend database connection fails on startup
+- Ensure SQL Server is running (`Get-Service MSSQLSERVER`).
+- Confirm database migrations have been applied (`dotnet ef database update --project Backend/GM.Infrastructure --startup-project Backend/GM.API`).
+- Ensure `TrustServerCertificate=True` is enabled when connecting with self-signed SSL certificates.
+
+### CORS errors in the browser console
+- Verify that `Cors:AllowedOrigins` in `appsettings.json` or the environment variable contains your frontend origin.
+- For local development, `http://localhost:5173` is included by default.
+
+### Uploaded images return 404
+- Verify that `Backend/GM.API/wwwroot/` exists. ASP.NET Core requires the WebRoot directory to exist at application startup to register static file handlers.
+- The repository includes `wwwroot/.gitkeep` to preserve the folder structure.
+
+### 401 Unauthorized errors on API requests
+- Check if the JWT has expired (default: 60 minutes).
+- Sign in again to refresh the client token in `localStorage`.
+
+---
+
+© 2026 Girls Market — Empowering women through commerce.
