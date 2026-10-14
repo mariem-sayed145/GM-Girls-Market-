@@ -20,6 +20,9 @@ function Home() {
     })
 
     const isStaff = user && (user.role === 1 || user.role === 2 || user.role === 'Employee' || user.role === 'Admin')
+    const isAdmin = Boolean(
+        user && (user.role === 2 || user.role === 'Admin' || String(user.role).toLowerCase() === 'admin')
+    )
 
     const [formData, setFormData] = useState({
         name: '',
@@ -227,6 +230,11 @@ function Home() {
                             </>
                         ) : (
                             <>
+                                {isAdmin && (
+                                    <Link to="/admin/products/add" className="nav-auth-btn" style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem' }}>
+                                        + Add Product
+                                    </Link>
+                                )}
                                 {isStaff ? (
                                     <Link to="/admin/products" className="nav-auth-badge staff">
                                         Admin Panel
@@ -280,6 +288,16 @@ function Home() {
                                 </>
                             ) : (
                                 <>
+                                    {isAdmin && (
+                                        <Link
+                                            to="/admin/products/add"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="mobile-drawer-btn"
+                                            style={{ marginBottom: '0.5rem', textAlign: 'center' }}
+                                        >
+                                            + Add Product
+                                        </Link>
+                                    )}
                                     {isStaff ? (
                                         <Link to="/admin/products" onClick={() => setMobileMenuOpen(false)}>
                                             Admin Panel
@@ -473,6 +491,16 @@ function Home() {
                                         src={getImageUrl(product.imageUrl)}
                                         alt={product.name}
                                     />
+                                    {isAdmin && (
+                                        <Link
+                                            to={`/admin/products/edit/${product.id}`}
+                                            className="edit-btn"
+                                            title="Edit Product"
+                                            aria-label={`Edit ${product.name}`}
+                                        >
+                                            ✎
+                                        </Link>
+                                    )}
                                 </div>
 
                                 <div className="product-info">

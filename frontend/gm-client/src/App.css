@@ -1096,6 +1096,8 @@ img {
     box-shadow: var(--shadow-sm);
     font-size: 1rem;
     transition: all var(--transition-fast);
+    z-index: 2;
+    text-decoration: none;
 }
 
 .edit-btn:hover {
