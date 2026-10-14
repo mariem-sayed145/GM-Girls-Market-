@@ -40,7 +40,33 @@ function CustomerRequests() {
     }
 
     useEffect(() => {
-        loadData()
+        let isMounted = true
+
+        Promise.all([
+            getMyRequests(),
+            getServices().catch(() => []),
+        ])
+            .then(([reqs, servs]) => {
+                if (isMounted) {
+                    setRequests(reqs)
+                    setServices(servs)
+                    setError('')
+                }
+            })
+            .catch((err) => {
+                if (isMounted) {
+                    setError(err.message || 'Failed to load requests.')
+                }
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setLoading(false)
+                }
+            })
+
+        return () => {
+            isMounted = false
+        }
     }, [])
 
     const handleFormChange = (e) => {

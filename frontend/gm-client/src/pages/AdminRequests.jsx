@@ -8,21 +8,30 @@ function AdminRequests() {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState('')
 
-    const load = async () => {
-        try {
-            setIsLoading(true)
-            setError('')
-            const data = await getAllRequests()
-            setRequests(data)
-        } catch (err) {
-            setError(err.message || 'Failed to load requests.')
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
     useEffect(() => {
-        load()
+        let isMounted = true
+
+        getAllRequests()
+            .then((data) => {
+                if (isMounted) {
+                    setRequests(data)
+                    setError('')
+                }
+            })
+            .catch((err) => {
+                if (isMounted) {
+                    setError(err.message || 'Failed to load requests.')
+                }
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setIsLoading(false)
+                }
+            })
+
+        return () => {
+            isMounted = false
+        }
     }, [])
 
     const handleLogout = () => {

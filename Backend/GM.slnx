@@ -3,4 +3,5 @@
   <Project Path="GM.Application/GM.Application.csproj" />
   <Project Path="GM.Domain/GM.Domain.csproj" />
   <Project Path="GM.Infrastructure/GM.Infrastructure.csproj" />
+  <Project Path="GM.Tests/GM.Tests.csproj" />
 </Solution>

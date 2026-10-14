@@ -16,11 +16,14 @@ function ProtectedRoute({ children, allowedRoles }) {
     }
 
     if (allowedRoles && allowedRoles.length > 0 && userJson) {
+        let isAuthorized = false
+        let parseError = false
+
         try {
             const user = JSON.parse(userJson)
             const role = user.role
 
-            const isAuthorized = allowedRoles.some((r) => {
+            isAuthorized = allowedRoles.some((r) => {
                 if (typeof r === 'number') {
                     return r === role || (role === 'Customer' && r === 0) || (role === 'Employee' && r === 1) || (role === 'Admin' && r === 2)
                 }
@@ -34,12 +37,16 @@ function ProtectedRoute({ children, allowedRoles }) {
                 }
                 return false
             })
-
-            if (!isAuthorized) {
-                return <Navigate to="/customer/dashboard" replace />
-            }
         } catch {
+            parseError = true
+        }
+
+        if (parseError) {
             return <Navigate to="/login" replace />
+        }
+
+        if (!isAuthorized) {
+            return <Navigate to="/customer/dashboard" replace />
         }
     }
 

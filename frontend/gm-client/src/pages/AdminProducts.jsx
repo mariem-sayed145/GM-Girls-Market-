@@ -9,21 +9,30 @@ function AdminProducts() {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState('')
 
-    const loadProducts = async () => {
-        try {
-            setIsLoading(true)
-            setError('')
-            const data = await getProducts()
-            setProducts(data)
-        } catch (err) {
-            setError(err.message || 'Failed to load products.')
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
     useEffect(() => {
-        loadProducts()
+        let isMounted = true
+
+        getProducts()
+            .then((data) => {
+                if (isMounted) {
+                    setProducts(data)
+                    setError('')
+                }
+            })
+            .catch((err) => {
+                if (isMounted) {
+                    setError(err.message || 'Failed to load products.')
+                }
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setIsLoading(false)
+                }
+            })
+
+        return () => {
+            isMounted = false
+        }
     }, [])
 
     const handleLogout = () => {

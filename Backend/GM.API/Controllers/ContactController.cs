@@ -17,7 +17,7 @@ public class ContactController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> CreateContact(
-        CreateContactInquiryCommand command,
+        [FromBody] CreateContactInquiryCommand command,
         CancellationToken cancellationToken)
     {
         await _mediator.Send(command, cancellationToken);

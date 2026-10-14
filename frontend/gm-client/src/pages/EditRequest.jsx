@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getRequestByIdAdmin, updateRequestStatus } from '../api/requestApi'
 
+const STATUS_TO_NUM = {
+    Pending: 0,
+    InProgress: 1,
+    Completed: 2,
+    Cancelled: 3,
+}
+
 function EditRequest() {
     const { id } = useParams()
     const navigate = useNavigate()
@@ -10,7 +17,7 @@ function EditRequest() {
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
     const [error, setError] = useState('')
-    const [status, setStatus] = useState('')
+    const [status, setStatus] = useState('0')
 
     useEffect(() => {
         const load = async () => {
@@ -21,7 +28,8 @@ function EditRequest() {
                 const data = await getRequestByIdAdmin(id)
 
                 setRequest(data)
-                setStatus(data.status)
+                const num = typeof data.status === 'number' ? data.status : (STATUS_TO_NUM[data.status] ?? 0)
+                setStatus(String(num))
             } catch (err) {
                 setError(err.message || 'Failed to load request.')
             } finally {
@@ -87,10 +95,10 @@ function EditRequest() {
                 <div className="form-group">
                     <label>Status</label>
                     <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                        <option value={0}>Pending</option>
-                        <option value={1}>InProgress</option>
-                        <option value={2}>Completed</option>
-                        <option value={3}>Cancelled</option>
+                        <option value="0">Pending</option>
+                        <option value="1">InProgress</option>
+                        <option value="2">Completed</option>
+                        <option value="3">Cancelled</option>
                     </select>
                 </div>
 

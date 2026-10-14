@@ -9,21 +9,30 @@ function AdminServices() {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState('')
 
-    const load = async () => {
-        try {
-            setIsLoading(true)
-            setError('')
-            const data = await getServices()
-            setServices(data)
-        } catch (err) {
-            setError(err.message || 'Failed to load services.')
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
     useEffect(() => {
-        load()
+        let isMounted = true
+
+        getServices()
+            .then((data) => {
+                if (isMounted) {
+                    setServices(data)
+                    setError('')
+                }
+            })
+            .catch((err) => {
+                if (isMounted) {
+                    setError(err.message || 'Failed to load services.')
+                }
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setIsLoading(false)
+                }
+            })
+
+        return () => {
+            isMounted = false
+        }
     }, [])
 
     const handleLogout = () => {
